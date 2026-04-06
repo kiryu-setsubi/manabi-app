@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>わくわく まなびアプリ</title>
+  <title>わくわく まなびアプリ DX</title>
   <style>
     :root{
       --bg1:#fff8e7;
@@ -15,6 +15,7 @@
       --accent3:#6c63ff;
       --good:#24b36b;
       --bad:#ef476f;
+      --gold:#f6b100;
       --shadow:0 12px 30px rgba(36,50,74,.12);
       --radius:24px;
     }
@@ -88,13 +89,9 @@
       cursor:pointer;
       user-select:none;
       transition:transform .15s ease;
-      position:relative;
-      z-index:1;
     }
 
-    .menu-card:active{
-      transform:scale(.99);
-    }
+    .menu-card:active{transform:scale(.99)}
 
     .menu-emoji{
       font-size:44px;
@@ -159,6 +156,7 @@
     button.secondary{background:var(--accent2); color:#fff}
     button.purple{background:var(--accent3); color:#fff}
     button.white{background:#fff; color:var(--text)}
+    button.gold{background:linear-gradient(135deg,#ffd76a,#f6b100); color:#533600}
 
     button.choice{
       min-height:78px;
@@ -273,6 +271,69 @@
       font-weight:700;
     }
 
+    .boss-badge{
+      display:inline-block;
+      margin-bottom:10px;
+      background:linear-gradient(135deg,#ff7a18,#ffb703);
+      color:#fff;
+      font-weight:900;
+      padding:8px 14px;
+      border-radius:999px;
+      box-shadow:0 8px 16px rgba(255,122,24,.28);
+    }
+
+    .reward-list{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+      gap:12px;
+      margin-top:14px;
+    }
+
+    .reward-item{
+      background:#fff;
+      border:2px solid #e9eef7;
+      border-radius:18px;
+      padding:14px;
+      font-weight:900;
+      text-align:center;
+    }
+
+    .timer-wrap{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:12px;
+      flex-wrap:wrap;
+    }
+
+    .timer-label{
+      font-weight:900;
+    }
+
+    .timer-bar{
+      flex:1;
+      min-width:180px;
+      height:14px;
+      background:#eef2f7;
+      border-radius:999px;
+      overflow:hidden;
+    }
+
+    .timer-bar > div{
+      height:100%;
+      width:100%;
+      background:linear-gradient(90deg,#22c55e,#f59e0b,#ef4444);
+      transition:width .25s linear;
+    }
+
+    .boss-panel{
+      background:linear-gradient(135deg,#fff7ed,#fff);
+      border:2px solid #fed7aa;
+      border-radius:20px;
+      padding:16px;
+      margin-bottom:14px;
+    }
+
     @media (max-width:640px){
       .memory-grid{gap:8px}
       button{font-size:16px;padding:13px 16px}
@@ -283,14 +344,15 @@
 <body>
   <div class="wrap">
     <div class="header">
-      <div class="title">🌟 わくわく まなびアプリ 🌟</div>
-      <div class="subtitle">6さいごろ向け たのしく あそんで べんきょうしよう！</div>
+      <div class="title">🌟 わくわく まなびアプリ DX 🌟</div>
+      <div class="subtitle">レベルアップ・タイマー・ボス問題・ごほうびつき！</div>
     </div>
 
     <div class="statusbar">
       <div class="pill">🏆 ほし: <span id="starCount">0</span></div>
-      <div class="pill">🎯 れんぞくせいかい: <span id="comboCount">0</span></div>
-      <div class="pill">🎉 クリアしたゲーム: <span id="clearCount">0</span></div>
+      <div class="pill">🎯 れんぞく: <span id="comboCount">0</span></div>
+      <div class="pill">🎉 クリア: <span id="clearCount">0</span></div>
+      <div class="pill">⬆️ レベル: <span id="levelCount">1</span></div>
     </div>
 
     <section id="homeScreen" class="screen active">
@@ -298,29 +360,29 @@
         <div class="menu-card" data-game="hiragana">
           <div class="menu-emoji">🔤</div>
           <div class="menu-title">ひらがな</div>
-          <div class="menu-desc">もんだいを みて、ただしい ひらがなを タップ！</div>
+          <div class="menu-desc">ことばの さいしょの もじを あてよう！</div>
         </div>
 
         <div class="menu-card" data-game="math">
           <div class="menu-emoji">➕</div>
           <div class="menu-title">すうじ</div>
-          <div class="menu-desc">たしざん・ひきざんを 3たくで こたえよう！</div>
+          <div class="menu-desc">たしざん・ひきざんを どんどんクリア！</div>
         </div>
 
         <div class="menu-card" data-game="memory">
           <div class="menu-emoji">🧠</div>
           <div class="menu-title">きおくゲーム</div>
-          <div class="menu-desc">おなじ えを そろえる しんけいすいじゃく！</div>
+          <div class="menu-desc">カードを そろえて きおくりょくアップ！</div>
         </div>
       </div>
 
       <div class="panel" style="margin-top:18px;">
-        <div class="game-title center">📚 このアプリで できること</div>
+        <div class="game-title center">🎮 ゲームっぽくなったポイント</div>
         <p class="center" style="font-size:18px;line-height:1.8;">
-          ひらがな・すうじ・きおくりょくを、<br>
-          ゲームみたいに たのしく れんしゅう できるよ。
+          レベルが上がると むずかしくなる！<br>
+          タイマーつき！ たまにボス問題！ ごほうびももらえる！
         </p>
-        <div class="footer-note">開いたらすぐ遊べる、シンプルで使いやすい版です。</div>
+        <div class="footer-note">開いたらすぐ遊べる版のまま、ゲーム要素を強化してます。</div>
       </div>
     </section>
 
@@ -333,6 +395,12 @@
             <button class="secondary" id="retryBtn">🔄 もういちど</button>
           </div>
         </div>
+
+        <div class="timer-wrap" id="timerWrap">
+          <div class="timer-label">⏰ のこり: <span id="timeText">10</span>秒</div>
+          <div class="timer-bar"><div id="timerBar"></div></div>
+        </div>
+
         <div class="progress"><div id="progressBar"></div></div>
         <div id="gameArea"></div>
       </div>
@@ -344,25 +412,9 @@
       stars: 0,
       combo: 0,
       clears: 0,
-      currentGame: null
-    };
-
-    const gameData = {
-      hiragana: [
-        { prompt: "「りんご」の さいしょの もじは？", answer: "り", choices: ["り", "れ", "る"] },
-        { prompt: "「ねこ」の さいしょの もじは？", answer: "ね", choices: ["ぬ", "ね", "の"] },
-        { prompt: "「いぬ」の さいしょの もじは？", answer: "い", choices: ["あ", "い", "う"] },
-        { prompt: "「さかな」の さいしょの もじは？", answer: "さ", choices: ["さ", "し", "す"] },
-        { prompt: "「もも」の さいしょの もじは？", answer: "も", choices: ["ま", "も", "め"] }
-      ],
-      math: [
-        { prompt: "2 + 1 は？", answer: "3", choices: ["2", "3", "4"] },
-        { prompt: "5 - 2 は？", answer: "3", choices: ["3", "2", "4"] },
-        { prompt: "4 + 3 は？", answer: "7", choices: ["7", "6", "8"] },
-        { prompt: "8 - 5 は？", answer: "3", choices: ["4", "2", "3"] },
-        { prompt: "6 + 2 は？", answer: "8", choices: ["8", "7", "9"] }
-      ],
-      memory: ["🐶","🐱","🐼","🦁","🐶","🐱","🐼","🦁"]
+      level: 1,
+      currentGame: null,
+      unlockedRewards: []
     };
 
     const gameState = {
@@ -371,7 +423,11 @@
       flipped: [],
       matched: 0,
       lock: false,
-      memoryCards: []
+      memoryCards: [],
+      currentQuestion: null,
+      isBoss: false,
+      timeLeft: 10,
+      timerId: null
     };
 
     const homeScreen = document.getElementById("homeScreen");
@@ -379,11 +435,15 @@
     const gameArea = document.getElementById("gameArea");
     const gameTitle = document.getElementById("gameTitle");
     const progressBar = document.getElementById("progressBar");
+    const timerWrap = document.getElementById("timerWrap");
+    const timerBar = document.getElementById("timerBar");
+    const timeText = document.getElementById("timeText");
 
     function updateStatus(){
       document.getElementById("starCount").textContent = appState.stars;
       document.getElementById("comboCount").textContent = appState.combo;
       document.getElementById("clearCount").textContent = appState.clears;
+      document.getElementById("levelCount").textContent = appState.level;
     }
 
     function setProgress(value){
@@ -395,6 +455,7 @@
     }
 
     function goHome(){
+      stopTimer();
       appState.currentGame = null;
       homeScreen.classList.add("active");
       gameScreen.classList.remove("active");
@@ -402,12 +463,14 @@
     }
 
     function openGame(name){
+      stopTimer();
       appState.currentGame = name;
       gameState.index = 0;
       gameState.score = 0;
       gameState.flipped = [];
       gameState.matched = 0;
       gameState.lock = false;
+      gameState.isBoss = false;
 
       homeScreen.classList.remove("active");
       gameScreen.classList.add("active");
@@ -433,15 +496,144 @@
     function rewardStars(n = 1){
       appState.stars += n;
       updateStatus();
+      checkRewardUnlock();
+    }
+
+    function checkRewardUnlock(){
+      const rewards = [
+        { need: 5, name: "🍬 キャンディ ごほうび" },
+        { need: 12, name: "👑 キラキラ かんむり" },
+        { need: 20, name: "🧸 スペシャル おもちゃ" },
+        { need: 35, name: "🚀 さいきょう ロケット" }
+      ];
+
+      rewards.forEach(r => {
+        if(appState.stars >= r.need && !appState.unlockedRewards.includes(r.name)){
+          appState.unlockedRewards.push(r.name);
+        }
+      });
+    }
+
+    function getDifficultyLevel(){
+      return Math.min(8, Math.floor((appState.level - 1) / 2) + 1);
+    }
+
+    function getTimerSeconds(){
+      return Math.max(5, 11 - getDifficultyLevel());
+    }
+
+    function startTimer(onTimeout){
+      stopTimer();
+      gameState.timeLeft = getTimerSeconds();
+      updateTimerUI();
+
+      gameState.timerId = setInterval(() => {
+        gameState.timeLeft -= 1;
+        updateTimerUI();
+
+        if(gameState.timeLeft <= 0){
+          stopTimer();
+          onTimeout();
+        }
+      }, 1000);
+    }
+
+    function stopTimer(){
+      if(gameState.timerId){
+        clearInterval(gameState.timerId);
+        gameState.timerId = null;
+      }
+    }
+
+    function updateTimerUI(){
+      timeText.textContent = gameState.timeLeft;
+      const total = getTimerSeconds();
+      const percent = (gameState.timeLeft / total) * 100;
+      timerBar.style.width = percent + "%";
+    }
+
+    function generateHiraganaQuestion(isBoss = false){
+      const wordsEasy = ["りんご","ねこ","いぬ","もも","さかな","やま","かわ","くるま"];
+      const wordsHard = ["れいぞうこ","しんかんせん","たこやき","でんしゃ","おにぎり","たまごやき"];
+      const useHard = getDifficultyLevel() >= 4 || isBoss;
+      const words = useHard ? wordsHard : wordsEasy;
+
+      const word = words[Math.floor(Math.random() * words.length)];
+      const correct = word[0];
+      const pool = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわ";
+      let count = isBoss ? 4 : 3;
+      let choices = [correct];
+
+      while(choices.length < count){
+        const c = pool[Math.floor(Math.random() * pool.length)];
+        if(!choices.includes(c)) choices.push(c);
+      }
+
+      return {
+        prompt: `「${word}」の さいしょの もじは？`,
+        answer: correct,
+        choices: shuffle(choices),
+        boss: isBoss
+      };
+    }
+
+    function generateMathQuestion(isBoss = false){
+      const diff = getDifficultyLevel();
+      const max = isBoss ? 20 : (diff <= 2 ? 9 : diff <= 4 ? 12 : 20);
+
+      let a = Math.floor(Math.random() * max) + 1;
+      let b = Math.floor(Math.random() * max) + 1;
+      const isPlus = Math.random() > 0.45;
+
+      let answer;
+      let prompt;
+
+      if(isPlus){
+        answer = a + b;
+        prompt = `${a} + ${b} は？`;
+      } else {
+        if(a < b){
+          const t = a;
+          a = b;
+          b = t;
+        }
+        answer = a - b;
+        prompt = `${a} - ${b} は？`;
+      }
+
+      let count = isBoss ? 4 : 3;
+      let choices = [answer];
+
+      while(choices.length < count){
+        let fake = answer + Math.floor(Math.random() * 7) - 3;
+        if(fake < 0) fake = answer + 1;
+        if(!choices.includes(fake)) choices.push(fake);
+      }
+
+      return {
+        prompt,
+        answer: String(answer),
+        choices: shuffle(choices.map(String)),
+        boss: isBoss
+      };
+    }
+
+    function generateQuestion(type, isBoss = false){
+      if(type === "hiragana") return generateHiraganaQuestion(isBoss);
+      if(type === "math") return generateMathQuestion(isBoss);
+      return null;
     }
 
     function renderQuiz(type){
-      const list = gameData[type];
-      const item = list[gameState.index];
-      const percent = (gameState.index / list.length) * 100;
+      gameState.isBoss = ((gameState.index + 1) % 5 === 0);
+      const item = generateQuestion(type, gameState.isBoss);
+      gameState.currentQuestion = item;
+
+      const percent = ((gameState.index % 5) / 5) * 100;
       setProgress(percent);
 
       gameArea.innerHTML = `
+        ${item.boss ? `<div class="boss-panel center"><div class="boss-badge">🔥 ボス問題！</div><div>これに正解すると ごほうびアップ！</div></div>` : ""}
         <div class="question">${item.prompt}</div>
         <div id="choicesWrap" class="choices"></div>
         <div class="message" id="quizMessage"></div>
@@ -449,7 +641,7 @@
 
       const choicesWrap = document.getElementById("choicesWrap");
 
-      shuffle(item.choices).forEach(choice => {
+      item.choices.forEach(choice => {
         const btn = document.createElement("button");
         btn.type = "button";
         btn.className = "choice";
@@ -457,54 +649,81 @@
         btn.addEventListener("click", () => checkQuizAnswer(type, choice));
         choicesWrap.appendChild(btn);
       });
+
+      timerWrap.style.display = "flex";
+      startTimer(() => {
+        const msg = document.getElementById("quizMessage");
+        msg.className = "message bad";
+        msg.textContent = "⏰ じかんぎれ！";
+        appState.combo = 0;
+        updateStatus();
+
+        setTimeout(() => {
+          gameState.index += 1;
+          renderQuiz(type);
+        }, 700);
+      });
     }
 
     function checkQuizAnswer(type, choice){
-      const item = gameData[type][gameState.index];
+      stopTimer();
+      const item = gameState.currentQuestion;
       const msg = document.getElementById("quizMessage");
 
       if(choice === item.answer){
         appState.combo += 1;
         gameState.score += 1;
-        rewardStars(1);
+
+        const gain = item.boss ? 3 : 1;
+        rewardStars(gain);
 
         msg.className = "message good";
-        msg.textContent = "⭕ せいかい！";
+        msg.textContent = item.boss ? "👑 ボスクリア！" : "⭕ せいかい！";
 
         setTimeout(() => {
           gameState.index += 1;
-          if(gameState.index < gameData[type].length){
-            renderQuiz(type);
+
+          if(item.boss){
+            finishQuiz(type, true);
           } else {
-            finishQuiz(type);
+            renderQuiz(type);
           }
+
           updateStatus();
-        }, 500);
+        }, 600);
 
       } else {
         appState.combo = 0;
         msg.className = "message bad";
         msg.textContent = "❌ ちがうよ〜";
         updateStatus();
+
+        setTimeout(() => {
+          gameState.index += 1;
+          renderQuiz(type);
+        }, 600);
       }
     }
 
-    function finishQuiz(type){
+    function finishQuiz(type, bossClear = false){
       setProgress(100);
       appState.clears += 1;
+      if(bossClear){
+        appState.level += 1;
+      }
       updateStatus();
 
-      const score = gameState.score;
-      const total = gameData[type].length;
-      const stars = score === total ? "★★★" : score >= total - 1 ? "★★☆" : "★☆☆";
-
-      if(score === total) rewardStars(2);
+      const rewardsHtml = appState.unlockedRewards.length
+        ? appState.unlockedRewards.map(r => `<div class="reward-item">${r}</div>`).join("")
+        : `<div class="reward-item">まだ ごほうびなし</div>`;
 
       gameArea.innerHTML = `
         <div class="result-box">
-          <div class="big">${score} / ${total}</div>
-          <div class="message good">🎉 クリア！ よくできました！</div>
-          <div class="stars">${stars}</div>
+          <div class="big">${gameState.score}</div>
+          <div class="message good">${bossClear ? "🎉 ステージクリア！ レベルアップ！" : "🎉 クリア！"}</div>
+          <div class="stars">${bossClear ? "★★★" : "★★☆"}</div>
+          <div style="margin-top:12px;font-weight:900;">いまのレベル: ${appState.level}</div>
+          <div class="reward-list">${rewardsHtml}</div>
           <div style="margin-top:16px;" class="button-row center">
             <button class="primary" id="againBtn">もういちど</button>
             <button class="purple" id="menuBtn">メニューへ</button>
@@ -517,23 +736,35 @@
     }
 
     function startMemoryGame(){
-      gameState.memoryCards = shuffle(gameData.memory).map((emoji, index) => ({
+      stopTimer();
+      timerWrap.style.display = "none";
+
+      const pairs = Math.min(6, 4 + Math.floor((appState.level - 1) / 2));
+      const emojis = ["🐶","🐱","🐼","🦁","🐸","🦊"];
+      const selected = emojis.slice(0, pairs);
+      gameState.memoryCards = shuffle([...selected, ...selected]).map((emoji, index) => ({
         id:index,
         emoji,
         open:false,
         matched:false
       }));
 
+      gameState.matched = 0;
+      gameState.flipped = [];
+      gameState.lock = false;
       setProgress(0);
       renderMemoryGame();
     }
 
     function renderMemoryGame(){
+      const totalPairs = gameState.memoryCards.length / 2;
       const matchedPairs = gameState.matched / 2;
-      const totalPairs = gameData.memory.length / 2;
       setProgress((matchedPairs / totalPairs) * 100);
 
+      const bossMode = matchedPairs + 1 === totalPairs;
+
       gameArea.innerHTML = `
+        ${bossMode ? `<div class="boss-panel center"><div class="boss-badge">🔥 ラストボス！</div><div>さいごのペアを そろえよう！</div></div>` : ""}
         <div class="question">おなじ えを 2まい そろえよう！</div>
         <div id="memoryGrid" class="memory-grid"></div>
         <div class="message" id="memoryMessage"></div>
@@ -564,21 +795,23 @@
       if(gameState.flipped.length === 2){
         gameState.lock = true;
 
-        const [a,b] = gameState.flipped;
+        const [a, b] = gameState.flipped;
         const cardA = gameState.memoryCards[a];
         const cardB = gameState.memoryCards[b];
         const msg = document.getElementById("memoryMessage");
 
         if(cardA.emoji === cardB.emoji){
+          const lastPair = gameState.matched + 2 === gameState.memoryCards.length;
+
           cardA.matched = true;
           cardB.matched = true;
           gameState.matched += 2;
           gameState.flipped = [];
           appState.combo += 1;
-          rewardStars(1);
+          rewardStars(lastPair ? 3 : 1);
 
           msg.className = "message good";
-          msg.textContent = "⭕ そろった！";
+          msg.textContent = lastPair ? "👑 ラストペア！" : "⭕ そろった！";
 
           gameState.lock = false;
           renderMemoryGame();
@@ -608,14 +841,21 @@
     function finishMemoryGame(){
       setProgress(100);
       appState.clears += 1;
+      appState.level += 1;
       rewardStars(2);
       updateStatus();
+
+      const rewardsHtml = appState.unlockedRewards.length
+        ? appState.unlockedRewards.map(r => `<div class="reward-item">${r}</div>`).join("")
+        : `<div class="reward-item">まだ ごほうびなし</div>`;
 
       gameArea.innerHTML = `
         <div class="result-box">
           <div class="big">クリア！</div>
-          <div class="message good">🧠 きおくりょく ばっちり！</div>
+          <div class="message good">🧠 きおくりょく ばっちり！ レベルアップ！</div>
           <div class="stars">★★★</div>
+          <div style="margin-top:12px;font-weight:900;">いまのレベル: ${appState.level}</div>
+          <div class="reward-list">${rewardsHtml}</div>
           <div style="margin-top:16px;" class="button-row center">
             <button class="primary" id="memoryAgainBtn">もういちど</button>
             <button class="purple" id="memoryMenuBtn">メニューへ</button>
