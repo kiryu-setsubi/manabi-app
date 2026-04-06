@@ -6,33 +6,27 @@
 <title>まなびアドベンチャーPRO</title>
 
 <style>
-body {
+body{
   margin:0;
   font-family:sans-serif;
   background:#0b1437;
   color:#fff;
 }
-
-.screen { display:none; }
-.active { display:block; }
-
-.container {
-  padding:20px;
-}
-
-h1 {
+.screen{display:none;}
+.screen.active{display:block;}
+.container{padding:20px;}
+h1{
   text-align:center;
   font-size:34px;
+  margin:0 0 20px;
 }
-
-.card {
+.card{
   background:#1f2b4d;
   padding:20px;
   border-radius:20px;
   margin-top:20px;
 }
-
-button {
+button{
   width:100%;
   padding:15px;
   margin-top:10px;
@@ -41,137 +35,189 @@ button {
   font-size:20px;
   color:#fff;
   background:linear-gradient(135deg,#4f46e5,#06b6d4);
-  
-  /* 🔥超重要（タップバグ対策） */
   position:relative;
   z-index:10;
   pointer-events:auto;
 }
-
-.choice {
+.choice{
   font-size:24px;
 }
-
-.good { color:#22c55e; }
-.bad { color:#ef4444; }
-
-.grid {
-  display:grid;
-  grid-template-columns:1fr 1fr;
+.good{color:#22c55e;}
+.bad{color:#ef4444;}
+.row{
+  display:flex;
   gap:10px;
+}
+.row button{
+  width:100%;
+}
+.small{
+  font-size:16px;
+  padding:12px;
+}
+.stat{
+  font-size:20px;
+  margin:8px 0;
 }
 </style>
 </head>
-
 <body>
 
 <!-- ログイン -->
 <div id="login" class="screen active container">
   <h1>🎓 まなびアドベンチャー</h1>
-
   <div class="card">
-    <input id="name" placeholder="なまえ" style="width:100%;padding:10px;border-radius:10px;border:none;">
-    <button onclick="start()">スタート</button>
+    <input id="name" placeholder="なまえ" style="width:100%;padding:14px;border-radius:10px;border:none;font-size:18px;box-sizing:border-box;">
+    <button id="startBtn">スタート</button>
   </div>
 </div>
 
 <!-- メイン -->
 <div id="main" class="screen container">
-  <h1 id="welcome"></h1>
+  <h1 id="welcome">プレイヤー</h1>
 
   <div class="card">
-    <p>コイン：<span id="coin">0</span></p>
-    <p>レベル：<span id="level">1</span></p>
+    <div class="stat">コイン：<span id="coin">0</span></div>
+    <div class="stat">レベル：<span id="level">1</span></div>
   </div>
 
   <div class="card">
-    <button onclick="startGame()">クイズスタート</button>
+    <button id="quizStartBtn">クイズスタート</button>
   </div>
 </div>
 
 <!-- ゲーム -->
 <div id="game" class="screen container">
-  <h1 id="question"></h1>
+  <h1 id="question">問題</h1>
   <div id="choices"></div>
-  <p id="msg"></p>
+  <p id="msg" style="font-size:24px;font-weight:bold;text-align:center;"></p>
+</div>
+
+<!-- クリア -->
+<div id="finish" class="screen container">
+  <h1>🎉 クリア！</h1>
+  <div class="card">
+    <p style="font-size:24px;">スコア：<span id="finalScore">0</span></p>
+    <div class="row">
+      <button id="retryBtn" class="small">もう一回</button>
+      <button id="homeBtn" class="small">ホームへ</button>
+    </div>
+  </div>
 </div>
 
 <script>
 let coin = 0;
 let level = 1;
 let current = 0;
+let score = 0;
+let playerName = "プレイヤー";
 
 const quiz = [
-  {q:"りんごはどれ？", choices:["🍎","🐶","🚗"], a:"🍎"},
-  {q:"ねこはどれ？", choices:["🐱","🐟","🐸"], a:"🐱"},
-  {q:"2+2は？", choices:["3","4","5"], a:"4"}
+  { q:"りんごはどれ？", choices:["🍎","🐶","🚗"], a:"🍎" },
+  { q:"ねこはどれ？", choices:["🐱","🐟","🐸"], a:"🐱" },
+  { q:"2+2は？", choices:["3","4","5"], a:"4" },
+  { q:"5-2は？", choices:["2","3","4"], a:"3" }
 ];
-
-function start(){
-  const name = document.getElementById("name").value || "プレイヤー";
-  document.getElementById("welcome").innerText = name;
-  show("main");
-}
 
 function show(id){
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
 
-function startGame(){
-  current = 0;
-  show("game");
-  render();
+function startApp(){
+  const inputName = document.getElementById("name").value.trim();
+  playerName = inputName || "プレイヤー";
+  document.getElementById("welcome").innerText = playerName;
+  updateMainStats();
+  show("main");
 }
 
-function render(){
+function updateMainStats(){
+  document.getElementById("coin").innerText = coin;
+  document.getElementById("level").innerText = level;
+}
+
+function startGame(){
+  current = 0;
+  score = 0;
+  show("game");
+  renderQuiz();
+}
+
+function renderQuiz(){
+  if(current >= quiz.length){
+    finishGame();
+    return;
+  }
+
   const q = quiz[current];
   document.getElementById("question").innerText = q.q;
 
   const box = document.getElementById("choices");
   box.innerHTML = "";
+  document.getElementById("msg").innerText = "";
+  document.getElementById("msg").className = "";
 
-  q.choices.forEach(c=>{
+  q.choices.forEach(choice => {
     const btn = document.createElement("button");
-    btn.className="choice";
-    btn.innerText=c;
+    btn.className = "choice";
+    btn.innerText = choice;
 
-    // 🔥タップバグ完全対策
-    btn.addEventListener("click", ()=>{
-      answer(c);
+    btn.addEventListener("click", () => {
+      answer(choice);
     });
 
     box.appendChild(btn);
   });
-
-  document.getElementById("msg").innerText="";
 }
 
-function answer(c){
+function answer(choice){
   const q = quiz[current];
+  const msg = document.getElementById("msg");
 
-  if(c===q.a){
-    coin+=5;
-    document.getElementById("msg").innerText="⭕せいかい！";
-    document.getElementById("msg").className="good";
+  if(choice === q.a){
+    score++;
+    coin += 5;
+    msg.innerText = "⭕ せいかい！";
+    msg.className = "good";
 
-    setTimeout(()=>{
-      current++;
-      if(current<quiz.length){
-        render();
-      }else{
-        level++;
-        show("main");
-        document.getElementById("coin").innerText=coin;
-        document.getElementById("level").innerText=level;
+    // 次の問題へ
+    current++;
+
+    setTimeout(() => {
+      if(current < quiz.length){
+        renderQuiz();
+      } else {
+        finishGame();
       }
-    },500);
+    }, 500);
 
-  }else{
-    document.getElementById("msg").innerText="❌ちがう！";
-    document.getElementById("msg").className="bad";
+  } else {
+    msg.innerText = "❌ ちがう！";
+    msg.className = "bad";
   }
 }
+
+function finishGame(){
+  level++;
+  updateMainStats();
+  document.getElementById("finalScore").innerText = score + " / " + quiz.length;
+  show("finish");
+}
+
+function retryGame(){
+  startGame();
+}
+
+function goHome(){
+  updateMainStats();
+  show("main");
+}
+
+document.getElementById("startBtn").addEventListener("click", startApp);
+document.getElementById("quizStartBtn").addEventListener("click", startGame);
+document.getElementById("retryBtn").addEventListener("click", retryGame);
+document.getElementById("homeBtn").addEventListener("click", goHome);
 </script>
 
 </body>
