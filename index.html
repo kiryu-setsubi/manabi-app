@@ -936,7 +936,7 @@
         </div>
         <div class="choices">
           ${shuffle(item.choices).map(choice => `
-            <button class="choice ${String(choice).length > 2 ? 'word' : ''}" onclick="checkQuizAnswer(${JSON.stringify(String(choice))})">${choice}</button>
+            <button class="choice ${String(choice).length > 2 ? 'word' : ''}" data-choice="${String(choice).replace(/"/g,'&quot;')}" onclick="checkQuizAnswer(this.dataset.choice)">${choice}</button>
           `).join("")}
         </div>
         <div id="gameMessage" class="message"></div>

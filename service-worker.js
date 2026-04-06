@@ -1,4 +1,4 @@
-const CACHE_NAME = 'manabi-adventure-pro-v1';
+const CACHE_NAME = 'manabi-adventure-pro-v2';
 const ASSETS = [
   './',
   './index.html',
