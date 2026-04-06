@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#6c63ff" />
+  <title>まなびアドベンチャー Pro</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <style>
+    :root{
+      --bg:#f5f7ff;
+      --bg2:#fff8eb;
+      --panel:rgba(255,255,255,.88);
+      --panel-solid:#fff;
+      --text:#24324a;
+      --muted:#6d7890;
+      --line:#e8edf8;
+      --primary:#6c63ff;
+      --primary2:#4d8dff;
+      --secondary:#2ec4b6;
+      --gold:#ffb703;
+      --pink:#ff6ba6;
+      --good:#18a957;
+      --bad:#ef476f;
+      --danger:#ff5a5f;
+      --shadow:0 20px 60px rgba(43,58,102,.12);
+      --radius-xl:30px;
+      --radius-lg:22px;
+      --radius-md:16px;
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{margin:0;padding:0}
+    body{
+      font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top left, #e3e9ff 0, transparent 26%),
+        radial-gradient(circle at top right, #ffeab6 0, transparent 18%),
+        linear-gradient(135deg,var(--bg),var(--bg2));
+      min-height:100vh;
+    }
+    .app{max-width:1220px;margin:0 auto;padding:14px}
+    .glass{
+      background:var(--panel);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow:var(--shadow);
+      border:1px solid rgba(255,255,255,.7);
+    }
+    .hide{display:none !important}
+    .login-screen{
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      padding:16px;
+    }
+    .login-card{
+      width:min(100%,560px);
+      border-radius:34px;
+      padding:22px;
+      position:relative;
+      overflow:hidden;
+    }
+    .login-card::before,.login-card::after{
+      content:"";position:absolute;border-radius:999px;opacity:.45;filter:blur(12px)
+    }
+    .login-card::before{width:200px;height:200px;background:#9bc9ff;left:-65px;top:-70px}
+    .login-card::after{width:190px;height:190px;background:#ffd466;right:-60px;bottom:-75px}
+    .login-inner{position:relative;z-index:1}
+    .brand{
+      display:inline-flex;gap:8px;align-items:center;background:#fff;padding:8px 12px;border-radius:999px;
+      font-weight:1000;box-shadow:0 8px 18px rgba(0,0,0,.06)
+    }
+    .login-title{
+      font-size:clamp(34px,6vw,58px);line-height:1.05;font-weight:1000;margin:14px 0 8px
+    }
+    .login-sub{font-size:16px;line-height:1.8;color:var(--muted);margin-bottom:18px}
+    .pet-preview{
+      display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;
+      padding:16px;border-radius:24px;background:linear-gradient(145deg,#fff,#f6f8ff);border:1px solid var(--line)
+    }
+    .pet-emoji{font-size:74px;line-height:1;text-align:center}
+    .input, select{
+      width:100%;border:none;border-radius:16px;padding:15px 16px;font-size:16px;font-weight:800;
+      background:#fff;border:1px solid var(--line);outline:none
+    }
+    .label{font-size:13px;color:var(--muted);font-weight:1000;margin:12px 0 8px}
+    button{
+      border:none;border-radius:16px;padding:14px 18px;font-size:16px;font-weight:1000;cursor:pointer;
+      box-shadow:0 10px 24px rgba(0,0,0,.08);transition:transform .12s ease, filter .12s ease
+    }
+    button:hover,button:active{transform:translateY(-1px)}
+    .primary{background:linear-gradient(90deg,var(--primary),var(--primary2));color:#fff}
+    .secondary{background:linear-gradient(90deg,var(--secondary),#4adccc);color:#fff}
+    .white{background:#fff;color:var(--text)}
+    .gold{background:linear-gradient(90deg,#ffcf4d,var(--gold));color:#6b5100}
+    .danger{background:linear-gradient(90deg,#ff7a7f,var(--danger));color:#fff}
+    .small{padding:10px 12px;font-size:14px;border-radius:12px}
+    .main-app{display:grid;grid-template-columns:300px 1fr;gap:16px}
+    .sidebar{padding:14px;border-radius:28px;height:fit-content;position:sticky;top:14px}
+    .nav-title{font-size:13px;font-weight:1000;color:var(--muted);letter-spacing:.08em;margin:6px 4px 12px}
+    .nav-btn{
+      width:100%;text-align:left;background:#fff;color:var(--text);margin-bottom:10px;padding:14px;border-radius:18px;
+      font-weight:1000;border:none;cursor:pointer;box-shadow:0 10px 24px rgba(67,77,112,.07)
+    }
+    .nav-btn.active{background:linear-gradient(90deg,var(--primary),var(--primary2));color:#fff}
+    .nav-btn small{display:block;font-size:12px;font-weight:800;opacity:.8;margin-top:4px}
+    .content section{padding:18px;border-radius:28px}
+    .hero{
+      overflow:hidden;position:relative
+    }
+    .hero::before,.hero::after{content:"";position:absolute;border-radius:999px;filter:blur(14px);opacity:.35}
+    .hero::before{width:230px;height:230px;left:-70px;top:-90px;background:#8ac6ff}
+    .hero::after{width:220px;height:220px;right:-55px;bottom:-95px;background:#ffd36c}
+    .hero-inner{position:relative;z-index:1;display:grid;grid-template-columns:1.2fr 1fr;gap:16px;align-items:center}
+    .hero-title{font-size:clamp(30px,5vw,54px);line-height:1.06;font-weight:1000;margin:0 0 10px}
+    .hero-sub{font-size:16px;line-height:1.8;color:var(--muted)}
+    .pet-card{
+      background:linear-gradient(145deg,#ffffff,#f6f8ff);border:1px solid var(--line);border-radius:26px;padding:18px;
+      box-shadow:0 18px 38px rgba(74,96,150,.12)
+    }
+    .pet-stage{
+      display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center
+    }
+    .pet-big{font-size:78px;line-height:1}
+    .progressbar{height:16px;background:#edf1fb;border-radius:999px;overflow:hidden}
+    .progressbar > div{height:100%;width:0%;background:linear-gradient(90deg,var(--gold),var(--secondary));transition:width .24s ease}
+    .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:16px}
+    .stat{
+      padding:16px 12px;border-radius:22px;text-align:center
+    }
+    .stat .num{display:block;font-size:clamp(20px,3.1vw,30px);font-weight:1000;margin-top:6px}
+    .section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+    .section-title{font-size:clamp(24px,4vw,36px);font-weight:1000;margin:0}
+    .chips{display:flex;gap:8px;flex-wrap:wrap}
+    .chip{padding:8px 12px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:13px;font-weight:1000;color:var(--muted)}
+    .card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+    .game-card,.shop-card,.badge-card,.calendar-card,.setting-card,.summary-card{
+      padding:18px;border-radius:24px;background:linear-gradient(160deg,#fff,#f7f9ff);border:1px solid #edf2fb;
+      box-shadow:0 14px 28px rgba(63,83,122,.08)
+    }
+    .game-card{cursor:pointer}
+    .game-card .emoji,.shop-card .emoji,.badge-card .emoji{font-size:42px;margin-bottom:8px}
+    .game-card .name,.shop-card .name,.badge-card .name{font-size:22px;font-weight:1000}
+    .desc{font-size:14px;line-height:1.7;color:var(--muted);margin-top:6px}
+    .game-top-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .question{font-size:clamp(28px,4.7vw,52px);line-height:1.4;font-weight:1000;text-align:center;margin:18px 0 20px}
+    .question .sub{display:block;font-size:clamp(15px,2.5vw,20px);color:var(--muted);margin-top:10px}
+    .choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+    .choice{
+      min-height:84px;width:100%;font-size:clamp(26px,4vw,40px);background:#fff;color:var(--text);border:2px solid #edf1fb
+    }
+    .choice.word{font-size:clamp(19px,2.9vw,28px);line-height:1.35}
+    .memory-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+    .memory-card{
+      aspect-ratio:1/1;border-radius:20px;background:#fff;border:2px solid #edf1fb;display:flex;align-items:center;justify-content:center;
+      font-size:clamp(24px,4.4vw,42px);font-weight:1000;cursor:pointer;box-shadow:0 10px 20px rgba(61,82,120,.07)
+    }
+    .memory-card.hidden{background:linear-gradient(160deg,#8d86ff,#69a5ff);color:transparent}
+    .message{min-height:36px;margin-top:14px;text-align:center;font-size:clamp(19px,2.8vw,26px);font-weight:1000}
+    .good{color:var(--good)} .bad{color:var(--bad)}
+    .result{text-align:center;padding:20px;border-radius:24px;background:linear-gradient(180deg,#fff,#f7fbff);border:1px solid #edf1fb;margin-top:12px}
+    .result .big{font-size:clamp(38px,6vw,72px);line-height:1.1;font-weight:1000;margin-bottom:6px}
+    .reward-box{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:14px}
+    .reward{background:#fff;border-radius:18px;padding:14px;border:1px solid #edf1fb;text-align:center;font-weight:1000}
+    .calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+    .calendar-head,.calendar-day{
+      background:#fff;border:1px solid var(--line);border-radius:16px;min-height:82px;padding:10px
+    }
+    .calendar-head{min-height:auto;text-align:center;font-weight:1000;color:var(--muted)}
+    .calendar-day .d{font-weight:1000;font-size:14px}
+    .calendar-day .m{margin-top:8px;font-size:12px;line-height:1.5;color:var(--muted)}
+    .calendar-day.active{background:linear-gradient(180deg,#fffce6,#fff);border-color:#ffd96b}
+    .calendar-day.today{outline:3px solid rgba(108,99,255,.18)}
+    .parents-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}
+    th{color:var(--muted);font-size:12px;letter-spacing:.06em}
+    .setting-row{display:flex;align-items:center;gap:10px;margin:10px 0;font-weight:900}
+    .toast{
+      position:fixed;left:50%;bottom:18px;transform:translateX(-50%) translateY(28px);background:rgba(36,50,74,.94);
+      color:#fff;padding:12px 16px;border-radius:999px;font-weight:1000;opacity:0;pointer-events:none;transition:.25s ease;z-index:999
+    }
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .top-note{margin-top:10px;font-size:12px;color:var(--muted);font-weight:900}
+    .install-box{margin-top:12px;padding:14px;border-radius:18px;background:#fff;border:1px dashed #d8deef}
+    input[type="checkbox"], input[type="radio"]{transform:scale(1.15)}
+    @media (max-width:960px){
+      .main-app,.hero-inner,.parents-grid{grid-template-columns:1fr}
+      .sidebar{position:relative;top:auto}
+      .stats{grid-template-columns:repeat(2,1fr)}
+    }
+    @media (max-width:640px){
+      .app{padding:10px}
+      .calendar-grid{gap:6px}
+      .calendar-head,.calendar-day{padding:8px;border-radius:12px}
+      .memory-grid{gap:8px}
+      .stats{grid-template-columns:repeat(2,1fr)}
+    }
+  </style>
+</head>
+<body>
+  <div id="loginScreen" class="login-screen">
+    <div class="login-card glass">
+      <div class="login-inner">
+        <div class="brand">🚀 PWA対応 学習アプリ</div>
+        <h1 class="login-title">まなびアドベンチャー Pro</h1>
+        <div class="login-sub">
+          ログイン風のはじまり画面つき。<br>
+          キャラ育成・親向け管理・学習カレンダー・ショップ・バッジ図鑑まで入った本格版。
+        </div>
+
+        <div class="pet-preview">
+          <div>
+            <div class="label">おこさまの なまえ</div>
+            <input id="childNameInput" class="input" placeholder="れい：はるき" />
+            <div class="label">相棒キャラ</div>
+            <select id="petSelect">
+              <option value="🦖">🦖 きょうりゅう</option>
+              <option value="🐰">🐰 うさぎ</option>
+              <option value="🐻">🐻 くま</option>
+              <option value="🦊">🦊 きつね</option>
+            </select>
+          </div>
+          <div class="pet-emoji" id="loginPetPreview">🦖</div>
+        </div>
+
+        <div class="label">保護者モード</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <input id="parentPinInput" class="input" type="password" placeholder="4けたPIN（例 1234）" maxlength="4" style="flex:1;min-width:170px" />
+          <button class="secondary" onclick="fillDemoData()">デモ体験</button>
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
+          <button class="primary" style="flex:1" onclick="startApp()">はじめる</button>
+        </div>
+        <div class="top-note">※ 保護者PINは管理画面を開くときに使います。空でも開始できます。</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="mainApp" class="app hide">
+    <div class="main-app">
+      <aside class="sidebar glass">
+        <div class="nav-title">MENU</div>
+        <button class="nav-btn active" onclick="showSection('home', this)">🏠 ホーム<small>学習トップ</small></button>
+        <button class="nav-btn" onclick="showSection('game', this)">🎮 ゲーム<small>プレイ画面</small></button>
+        <button class="nav-btn" onclick="showSection('shop', this)">🛒 ショップ<small>コインでお買いもの</small></button>
+        <button class="nav-btn" onclick="showSection('badges', this)">🏅 バッジ図鑑<small>集めた証し</small></button>
+        <button class="nav-btn" onclick="showSection('calendar', this)">🗓️ カレンダー<small>日別の学習記録</small></button>
+        <button class="nav-btn" onclick="showSection('parents', this)">👨‍👩‍👧 親向け<small>管理ダッシュボード</small></button>
+        <button class="nav-btn" onclick="showSection('settings', this)">⚙️ せってい<small>PWA / 音 / データ</small></button>
+      </aside>
+
+      <main class="content">
+        <section id="section-home" class="glass hero">
+          <div class="hero-inner">
+            <div>
+              <div class="brand">✨ プレミアム版</div>
+              <h1 class="hero-title"><span id="homeChildName">おこさま</span> の<br>まなびアドベンチャー</h1>
+              <div class="hero-sub">
+                毎日の学習でコインと経験値を集めて、相棒キャラを育てよう。<br>
+                遊びながら学べて、親は進み具合を管理できる本格キッズアプリ風。
+              </div>
+              <div class="install-box">
+                <div style="font-weight:1000;margin-bottom:6px">📲 ホーム画面に追加できるPWA仕様</div>
+                <div style="font-size:14px;color:var(--muted);line-height:1.7">
+                  SafariやChromeで開いて、共有メニューからホーム画面に追加するとアプリ風に使えます。
+                </div>
+              </div>
+            </div>
+            <div class="pet-card">
+              <div class="pet-stage">
+                <div id="petEmojiBig" class="pet-big">🦖</div>
+                <div>
+                  <div style="font-size:24px;font-weight:1000"><span id="petNickname">あいぼう</span> Lv.<span id="petLevel">1</span></div>
+                  <div style="font-size:14px;color:var(--muted);margin-top:4px">しんかまで あと <span id="nextEvolutionText">4</span> レベル</div>
+                  <div class="progressbar" style="margin-top:10px"><div id="xpFill"></div></div>
+                  <div style="font-size:13px;color:var(--muted);font-weight:900;margin-top:6px">XP: <span id="xpText">0 / 100</span></div>
+                </div>
+              </div>
+              <div class="reward-box" style="margin-top:14px">
+                <div class="reward">⭐ ほし<br><span id="starCount">0</span></div>
+                <div class="reward">🪙 コイン<br><span id="coinCount">0</span></div>
+                <div class="reward">🔥 コンボ<br><span id="comboCount">0</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="stats">
+            <div class="stat glass">✅<span class="num" id="clearCount">0</span>クリア</div>
+            <div class="stat glass">🎯<span class="num" id="answeredCount">0</span>もんだい</div>
+            <div class="stat glass">📖<span class="num" id="accuracyCount">0%</span>せいかいりつ</div>
+            <div class="stat glass">🏅<span class="num" id="badgeCount">0</span>バッジ</div>
+            <div class="stat glass">🧠<span class="num" id="pairCount">0</span>ペア</div>
+          </div>
+        </section>
+
+        <section id="section-game" class="glass hide">
+          <div class="section-head">
+            <h2 class="section-title" id="gameTitle">ゲーム</h2>
+            <div class="game-top-actions">
+              <button class="white small" onclick="showSection('home')">🏠 ホーム</button>
+              <button class="secondary small" onclick="repeatVoice()">🔊 よみあげ</button>
+              <button class="gold small" onclick="restartCurrentGame()">🔄 もういちど</button>
+            </div>
+          </div>
+          <div class="progressbar"><div id="gameProgress"></div></div>
+          <div id="gameArea"></div>
+        </section>
+
+        <section id="section-shop" class="glass hide">
+          <div class="section-head">
+            <h2 class="section-title">コインショップ</h2>
+            <div class="chips">
+              <div class="chip">今のコイン: <span id="shopCoinCount">0</span></div>
+            </div>
+          </div>
+          <div id="shopGrid" class="card-grid"></div>
+        </section>
+
+        <section id="section-badges" class="glass hide">
+          <div class="section-head">
+            <h2 class="section-title">バッジ図鑑</h2>
+            <div class="chips">
+              <div class="chip">集めたバッジを表示</div>
+            </div>
+          </div>
+          <div id="badgeGrid" class="card-grid"></div>
+        </section>
+
+        <section id="section-calendar" class="glass hide">
+          <div class="section-head">
+            <h2 class="section-title">日別の学習カレンダー</h2>
+            <div class="chips">
+              <div class="chip">当月の学習記録</div>
+            </div>
+          </div>
+          <div class="calendar-grid" id="calendarGrid"></div>
+        </section>
+
+        <section id="section-parents" class="glass hide">
+          <div class="section-head">
+            <h2 class="section-title">親向け管理画面</h2>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <input id="parentPinCheck" class="input" type="password" maxlength="4" placeholder="PIN入力" style="width:160px;padding:11px 12px;border-radius:12px">
+              <button class="primary small" onclick="unlockParentMode()">開く</button>
+            </div>
+          </div>
+
+          <div id="parentLockedBox" class="result">
+            <div class="big">🔒</div>
+            <div style="font-size:22px;font-weight:1000">保護者PINでロック中</div>
+            <div class="desc">PINを設定していない場合は、そのまま「開く」で入れます。</div>
+          </div>
+
+          <div id="parentPanel" class="hide">
+            <div class="parents-grid">
+              <div class="summary-card">
+                <div style="font-size:22px;font-weight:1000;margin-bottom:10px">学習サマリー</div>
+                <table>
+                  <tr><th>項目</th><th>内容</th></tr>
+                  <tr><td>おこさま名</td><td id="pChildName">-</td></tr>
+                  <tr><td>相棒キャラ</td><td id="pPetName">-</td></tr>
+                  <tr><td>クリア数</td><td id="pClears">0</td></tr>
+                  <tr><td>回答数</td><td id="pAnswers">0</td></tr>
+                  <tr><td>正答率</td><td id="pAccuracy">0%</td></tr>
+                  <tr><td>所持コイン</td><td id="pCoins">0</td></tr>
+                  <tr><td>解除バッジ</td><td id="pBadges">0</td></tr>
+                </table>
+              </div>
+              <div class="summary-card">
+                <div style="font-size:22px;font-weight:1000;margin-bottom:10px">今月の記録</div>
+                <table>
+                  <tr><th>日付</th><th>学習内容</th><th>コイン</th></tr>
+                  <tbody id="parentHistory"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="section-settings" class="glass hide">
+          <div class="section-head">
+            <h2 class="section-title">せってい</h2>
+            <div class="chips">
+              <div class="chip">音 / PWA / データ</div>
+            </div>
+          </div>
+          <div class="card-grid">
+            <div class="setting-card">
+              <div style="font-size:22px;font-weight:1000">🔊 音</div>
+              <div class="setting-row"><input id="toggleVoice" type="checkbox"> よみあげを つかう</div>
+              <div class="setting-row"><input id="toggleSfx" type="checkbox" checked> 効果音を つかう</div>
+              <div class="setting-row"><input id="toggleBgm" type="checkbox"> BGMを つかう</div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+                <button class="secondary small" onclick="toggleBgmNow()">BGM 再生 / 停止</button>
+              </div>
+            </div>
+            <div class="setting-card">
+              <div style="font-size:22px;font-weight:1000">🎯 難易度</div>
+              <div class="setting-row"><input type="radio" name="difficulty" value="easy"> かんたん</div>
+              <div class="setting-row"><input type="radio" name="difficulty" value="normal" checked> ふつう</div>
+              <div class="setting-row"><input type="radio" name="difficulty" value="hard"> ちょいむず</div>
+            </div>
+            <div class="setting-card">
+              <div style="font-size:22px;font-weight:1000">📲 PWA</div>
+              <div class="desc">manifest と service worker を同梱。HTTPS環境に置けばホーム画面追加しやすくなります。</div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+                <button class="white small" onclick="showInstallHelp()">ホーム画面追加の見方</button>
+              </div>
+            </div>
+            <div class="setting-card">
+              <div style="font-size:22px;font-weight:1000">🗂️ データ</div>
+              <div class="desc">成績・コイン・バッジ・カレンダー記録をまとめて初期化。</div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+                <button class="danger small" onclick="resetAllData()">ぜんぶリセット</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="section-home2" class="glass" style="margin-top:16px">
+          <div class="section-head">
+            <h2 class="section-title">ゲームを えらぼう</h2>
+            <div class="chips">
+              <div class="chip">学習 + ごほうび + 育成</div>
+            </div>
+          </div>
+          <div class="card-grid">
+            <div class="game-card" onclick="startGame('hiragana')">
+              <div class="emoji">🔤</div>
+              <div class="name">ひらがな</div>
+              <div class="desc">ことばの はじめの もじを えらぶ。</div>
+            </div>
+            <div class="game-card" onclick="startGame('math')">
+              <div class="emoji">➕</div>
+              <div class="name">すうじ</div>
+              <div class="desc">たしざん・ひきざんを 3たくで。</div>
+            </div>
+            <div class="game-card" onclick="startGame('memory')">
+              <div class="emoji">🧠</div>
+              <div class="name">きおく</div>
+              <div class="desc">おなじカードを そろえよう。</div>
+            </div>
+            <div class="game-card" onclick="startGame('shapes')">
+              <div class="emoji">🟦</div>
+              <div class="name">かたち</div>
+              <div class="desc">図形やマークの なまえを 覚える。</div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">保存しました</div>
+
+  <script>
+    const STORAGE_KEY = "manabi_adventure_pro_v2";
+
+    const DATA = {
+      hiragana: [
+        { prompt:"「りんご」の さいしょの もじは？", subtitle:"ただしい ひらがなを えらぼう", answer:"り", choices:["り","れ","る"] },
+        { prompt:"「ねこ」の さいしょの もじは？", subtitle:"どれかな？", answer:"ね", choices:["ぬ","ね","の"] },
+        { prompt:"「いぬ」の さいしょの もじは？", subtitle:"ことばの はじめ", answer:"い", choices:["あ","い","う"] },
+        { prompt:"「さかな」の さいしょの もじは？", subtitle:"せいかい できるかな？", answer:"さ", choices:["さ","し","す"] },
+        { prompt:"「もも」の さいしょの もじは？", subtitle:"くだものの名前", answer:"も", choices:["ま","も","め"] }
+      ],
+      math_easy: [
+        { prompt:"1 + 2 は？", answer:"3", choices:["2","3","4"] },
+        { prompt:"5 - 3 は？", answer:"2", choices:["2","1","3"] },
+        { prompt:"2 + 2 は？", answer:"4", choices:["3","4","5"] },
+        { prompt:"6 - 1 は？", answer:"5", choices:["5","4","6"] }
+      ],
+      math_normal: [
+        { prompt:"2 + 4 は？", answer:"6", choices:["5","6","7"] },
+        { prompt:"7 - 3 は？", answer:"4", choices:["4","3","5"] },
+        { prompt:"5 + 3 は？", answer:"8", choices:["7","8","9"] },
+        { prompt:"9 - 4 は？", answer:"5", choices:["4","5","6"] }
+      ],
+      math_hard: [
+        { prompt:"8 + 3 は？", answer:"11", choices:["10","11","12"] },
+        { prompt:"12 - 5 は？", answer:"7", choices:["6","7","8"] },
+        { prompt:"9 + 4 は？", answer:"13", choices:["12","13","14"] },
+        { prompt:"11 - 6 は？", answer:"5", choices:["4","5","6"] }
+      ],
+      shapes: [
+        { prompt:"まる は どれ？", answer:"⚪", choices:["⚪","🔺","🟦"] },
+        { prompt:"さんかく は どれ？", answer:"🔺", choices:["⚪","🔺","🟨"] },
+        { prompt:"しかく は どれ？", answer:"🟦", choices:["🟦","⚪","⭐"] },
+        { prompt:"ほし は どれ？", answer:"⭐", choices:["⭐","⚪","🔺"] }
+      ],
+      memory_easy: ["🐶","🐱","🐶","🐱","🐼","🦁","🐼","🦁"],
+      memory_normal: ["🐶","🐱","🐼","🦁","🐵","🐰","🐶","🐱","🐼","🦁","🐵","🐰"],
+      memory_hard: ["🐶","🐱","🐼","🦁","🐵","🐰","🦊","🐸","🐶","🐱","🐼","🦁","🐵","🐰","🦊","🐸"]
+    };
+
+    const SHOP_ITEMS = [
+      { id:"hat", icon:"🎩", name:"ぼうし", price:20, effect:"見た目アップ" },
+      { id:"candy", icon:"🍭", name:"キャンディ", price:15, effect:"ごきげんアップ" },
+      { id:"ball", icon:"⚽", name:"ボール", price:25, effect:"あそび道具" },
+      { id:"cape", icon:"🦸", name:"ヒーローマント", price:35, effect:"レアきせかえ" },
+      { id:"crown", icon:"👑", name:"おうかん", price:45, effect:"プレミアムきせかえ" },
+      { id:"book", icon:"📘", name:"まほうのえほん", price:30, effect:"学習力アップ" }
+    ];
+
+    const BADGES = [
+      { id:"start", icon:"🌱", name:"はじめの一歩", condition:"最初のクリア" },
+      { id:"streak3", icon:"🔥", name:"3れんぞく", condition:"3連続正解" },
+      { id:"coins50", icon:"🪙", name:"コイン名人", condition:"コイン50枚" },
+      { id:"pairs5", icon:"🧠", name:"きおく王", condition:"5ペア達成" },
+      { id:"level3", icon:"🐣", name:"育成スタート", condition:"Lv.3到達" },
+      { id:"level5", icon:"🦄", name:"しんか直前", condition:"Lv.5到達" },
+      { id:"shop1", icon:"🛍️", name:"おかいもの", condition:"ショップ初購入" },
+      { id:"calendar7", icon:"🗓️", name:"1週間学習", condition:"学習日7日" }
+    ];
+
+    const state = {
+      childName:"",
+      parentPin:"",
+      petBase:"🦖",
+      petLevel:1,
+      petMood:0,
+      stars:0,
+      coins:0,
+      combo:0,
+      clears:0,
+      xp:0,
+      answered:0,
+      correct:0,
+      pairCount:0,
+      badges:[],
+      inventory:[],
+      settings:{
+        voice:true,
+        sfx:true,
+        bgm:false,
+        difficulty:"normal"
+      },
+      calendar:{},
+      history:[],
+      currentGame:null,
+      lastPrompt:"",
+      parentUnlocked:false,
+      game:{
+        index:0,
+        score:0,
+        list:[],
+        flipped:[],
+        matched:0,
+        lock:false,
+        memoryCards:[]
+      }
+    };
+
+    let audioCtx = null;
+    let bgmInterval = null;
+    let deferredPrompt = null;
+
+    function save(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+    function load(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return;
+        const data = JSON.parse(raw);
+        Object.assign(state, data);
+      }catch(e){}
+    }
+
+    function shuffle(arr){ return [...arr].sort(() => Math.random() - 0.5); }
+    function todayKey(){
+      const d = new Date();
+      const m = String(d.getMonth()+1).padStart(2,"0");
+      const day = String(d.getDate()).padStart(2,"0");
+      return `${d.getFullYear()}-${m}-${day}`;
+    }
+    function currentMonthInfo(){
+      const now = new Date();
+      return { y: now.getFullYear(), m: now.getMonth() };
+    }
+    function showToast(text){
+      const t = document.getElementById("toast");
+      t.textContent = text;
+      t.classList.add("show");
+      clearTimeout(showToast.t);
+      showToast.t = setTimeout(()=>t.classList.remove("show"), 1700);
+    }
+
+    function petDisplay(){
+      const lvl = state.petLevel;
+      const base = state.petBase;
+      if(base === "🦖"){
+        if(lvl >= 5) return "🐲";
+        if(lvl >= 3) return "🦕";
+        return "🦖";
+      }
+      if(base === "🐰"){
+        if(lvl >= 5) return "🐇";
+        if(lvl >= 3) return "🐰";
+        return "🐰";
+      }
+      if(base === "🐻"){
+        if(lvl >= 5) return "🧸";
+        if(lvl >= 3) return "🐻";
+        return "🐻";
+      }
+      if(base === "🦊"){
+        if(lvl >= 5) return "🐺";
+        if(lvl >= 3) return "🦊";
+        return "🦊";
+      }
+      return base;
+    }
+
+    function updateTop(){
+      document.getElementById("homeChildName").textContent = state.childName || "おこさま";
+      document.getElementById("petEmojiBig").textContent = petDisplay();
+      document.getElementById("petNickname").textContent = (state.childName || "あいぼう") + " のともだち";
+      document.getElementById("petLevel").textContent = state.petLevel;
+      document.getElementById("starCount").textContent = state.stars;
+      document.getElementById("coinCount").textContent = state.coins;
+      document.getElementById("comboCount").textContent = state.combo;
+      document.getElementById("clearCount").textContent = state.clears;
+      document.getElementById("answeredCount").textContent = state.answered;
+      const accuracy = state.answered ? Math.round((state.correct / state.answered) * 100) : 0;
+      document.getElementById("accuracyCount").textContent = accuracy + "%";
+      document.getElementById("badgeCount").textContent = state.badges.length;
+      document.getElementById("pairCount").textContent = state.pairCount;
+      document.getElementById("shopCoinCount").textContent = state.coins;
+
+      const currentXP = state.xp - ((state.petLevel - 1) * 100);
+      document.getElementById("xpFill").style.width = Math.max(0, Math.min(100, currentXP)) + "%";
+      document.getElementById("xpText").textContent = currentXP + " / 100";
+      document.getElementById("nextEvolutionText").textContent = Math.max(0, 5 - state.petLevel);
+
+      document.getElementById("toggleVoice").checked = state.settings.voice;
+      document.getElementById("toggleSfx").checked = state.settings.sfx;
+      document.getElementById("toggleBgm").checked = state.settings.bgm;
+      document.querySelectorAll('input[name="difficulty"]').forEach(r => r.checked = r.value === state.settings.difficulty);
+      renderShop();
+      renderBadges();
+      renderCalendar();
+      renderParentPanel();
+      save();
+    }
+
+    function unlockBadge(id){
+      if(!state.badges.includes(id)){
+        state.badges.push(id);
+        showToast("バッジGET！");
+        if(state.settings.sfx) sfxWin();
+      }
+    }
+    function checkBadges(){
+      if(state.clears >= 1) unlockBadge("start");
+      if(state.combo >= 3) unlockBadge("streak3");
+      if(state.coins >= 50) unlockBadge("coins50");
+      if(state.pairCount >= 5) unlockBadge("pairs5");
+      if(state.petLevel >= 3) unlockBadge("level3");
+      if(state.petLevel >= 5) unlockBadge("level5");
+      if(state.inventory.length >= 1) unlockBadge("shop1");
+      if(Object.keys(state.calendar).length >= 7) unlockBadge("calendar7");
+    }
+
+    function addXp(amount){
+      state.xp += amount;
+      let leveled = false;
+      while(state.xp >= state.petLevel * 100){
+        state.petLevel += 1;
+        leveled = true;
+      }
+      if(leveled){
+        showToast("キャラが成長した！");
+        if(state.settings.sfx) sfxLevel();
+      }
+    }
+
+    function addDailyRecord(type, coins, correctDelta=0, answeredDelta=0){
+      const key = todayKey();
+      if(!state.calendar[key]){
+        state.calendar[key] = { plays:0, coins:0, types:{} };
+      }
+      state.calendar[key].plays += 1;
+      state.calendar[key].coins += coins;
+      state.calendar[key].types[type] = (state.calendar[key].types[type] || 0) + 1;
+      state.history.unshift({
+        date:key,
+        type:type,
+        coins:coins
+      });
+      state.history = state.history.slice(0, 15);
+    }
+
+    function speak(text){
+      state.lastPrompt = text;
+      if(!state.settings.voice) return;
+      if(!("speechSynthesis" in window)) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "ja-JP";
+      u.rate = .95;
+      u.pitch = 1.03;
+      window.speechSynthesis.speak(u);
+    }
+    function repeatVoice(){ if(state.lastPrompt) speak(state.lastPrompt); }
+
+    function ensureAudio(){
+      if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if(audioCtx.state === "suspended") audioCtx.resume();
+      return audioCtx;
+    }
+    function tone(freq=440, dur=.12, type="sine", gain=.03, when=0){
+      if(!state.settings.sfx && !state.settings.bgm) return;
+      const ctx = ensureAudio();
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = type;
+      osc.frequency.value = freq;
+      g.gain.value = gain;
+      osc.connect(g).connect(ctx.destination);
+      const start = ctx.currentTime + when;
+      osc.start(start);
+      g.gain.setValueAtTime(gain, start);
+      g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+      osc.stop(start + dur);
+    }
+    function sfxWin(){ if(state.settings.sfx){ tone(660,.08,"triangle",.045); tone(880,.12,"triangle",.04,.08); } }
+    function sfxWrong(){ if(state.settings.sfx){ tone(230,.09,"sawtooth",.04); tone(180,.11,"sawtooth",.03,.08); } }
+    function sfxLevel(){ if(state.settings.sfx){ tone(523,.09,"triangle",.04); tone(659,.09,"triangle",.04,.09); tone(784,.14,"triangle",.05,.18); } }
+
+    function startBgm(){
+      stopBgm();
+      if(!state.settings.bgm) return;
+      const notes = [392, 523, 659, 523];
+      let i = 0;
+      bgmInterval = setInterval(() => {
+        tone(notes[i % notes.length], .22, "triangle", .018);
+        i++;
+      }, 320);
+    }
+    function stopBgm(){
+      if(bgmInterval){ clearInterval(bgmInterval); bgmInterval = null; }
+    }
+    function toggleBgmNow(){
+      state.settings.bgm = !state.settings.bgm;
+      document.getElementById("toggleBgm").checked = state.settings.bgm;
+      if(state.settings.bgm) startBgm(); else stopBgm();
+      updateTop();
+      showToast(state.settings.bgm ? "BGMを再生" : "BGMを停止");
+    }
+
+    function fillDemoData(){
+      document.getElementById("childNameInput").value = "はるき";
+      document.getElementById("petSelect").value = "🦖";
+      document.getElementById("parentPinInput").value = "1234";
+      document.getElementById("loginPetPreview").textContent = "🦖";
+    }
+
+    function startApp(){
+      state.childName = document.getElementById("childNameInput").value.trim() || "おこさま";
+      state.parentPin = document.getElementById("parentPinInput").value.trim();
+      state.petBase = document.getElementById("petSelect").value;
+      document.getElementById("loginScreen").classList.add("hide");
+      document.getElementById("mainApp").classList.remove("hide");
+      updateTop();
+      if(state.settings.bgm) startBgm();
+      showSection('home');
+    }
+
+    function showSection(name, btn){
+      const map = ["home","game","shop","badges","calendar","parents","settings"];
+      map.forEach(id => {
+        const el = document.getElementById("section-" + id);
+        if(el) el.classList.toggle("hide", id !== name);
+      });
+      document.querySelectorAll(".nav-btn").forEach(el => el.classList.remove("active"));
+      if(btn){ btn.classList.add("active"); }
+      else{
+        const btns = document.querySelectorAll(".nav-btn");
+        const order = {home:0,game:1,shop:2,badges:3,calendar:4,parents:5,settings:6};
+        if(btns[order[name]]) btns[order[name]].classList.add("active");
+      }
+    }
+
+    function renderShop(){
+      const box = document.getElementById("shopGrid");
+      box.innerHTML = SHOP_ITEMS.map(item => {
+        const owned = state.inventory.includes(item.id);
+        return `
+          <div class="shop-card">
+            <div class="emoji">${item.icon}</div>
+            <div class="name">${item.name}</div>
+            <div class="desc">${item.effect}</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+              <div class="chip">🪙 ${item.price}</div>
+              <button class="${owned ? 'white' : 'gold'} small" ${owned ? 'disabled' : ''} onclick="buyItem('${item.id}')">
+                ${owned ? '購入ずみ' : '買う'}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function buyItem(id){
+      const item = SHOP_ITEMS.find(x => x.id === id);
+      if(!item) return;
+      if(state.inventory.includes(id)){ showToast("もう持ってるよ"); return; }
+      if(state.coins < item.price){ showToast("コインがたりない"); sfxWrong(); return; }
+      state.coins -= item.price;
+      state.inventory.push(id);
+      checkBadges();
+      updateTop();
+      sfxWin();
+      showToast(item.name + " を買った！");
+    }
+
+    function renderBadges(){
+      const box = document.getElementById("badgeGrid");
+      box.innerHTML = BADGES.map(b => {
+        const ok = state.badges.includes(b.id);
+        return `
+          <div class="badge-card" style="${ok ? '' : 'opacity:.48'}">
+            <div class="emoji">${b.icon}</div>
+            <div class="name">${b.name}</div>
+            <div class="desc">${ok ? '獲得ずみ！' : b.condition}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderCalendar(){
+      const box = document.getElementById("calendarGrid");
+      const week = ["日","月","火","水","木","金","土"];
+      const {y,m} = currentMonthInfo();
+      const first = new Date(y, m, 1);
+      const last = new Date(y, m + 1, 0);
+      const startDay = first.getDay();
+      let html = week.map(w => `<div class="calendar-head">${w}</div>`).join("");
+      for(let i=0;i<startDay;i++) html += `<div class="calendar-day" style="opacity:.25"></div>`;
+      const today = todayKey();
+      for(let d=1; d<=last.getDate(); d++){
+        const key = `${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+        const rec = state.calendar[key];
+        const isToday = key === today;
+        html += `
+          <div class="calendar-day ${rec ? 'active' : ''} ${isToday ? 'today' : ''}">
+            <div class="d">${d}</div>
+            <div class="m">
+              ${rec ? `🎮 ${rec.plays}回<br>🪙 ${rec.coins}` : '―'}
+            </div>
+          </div>
+        `;
+      }
+      box.innerHTML = html;
+    }
+
+    function renderParentPanel(){
+      document.getElementById("pChildName").textContent = state.childName || "-";
+      document.getElementById("pPetName").textContent = petDisplay();
+      document.getElementById("pClears").textContent = state.clears;
+      document.getElementById("pAnswers").textContent = state.answered;
+      document.getElementById("pAccuracy").textContent = (state.answered ? Math.round((state.correct/state.answered)*100) : 0) + "%";
+      document.getElementById("pCoins").textContent = state.coins;
+      document.getElementById("pBadges").textContent = state.badges.length;
+      const tbody = document.getElementById("parentHistory");
+      tbody.innerHTML = state.history.length ? state.history.map(r => `
+        <tr><td>${r.date}</td><td>${r.type}</td><td>+${r.coins}</td></tr>
+      `).join("") : `<tr><td colspan="3">まだ記録がありません</td></tr>`;
+    }
+
+    function unlockParentMode(){
+      const input = document.getElementById("parentPinCheck").value.trim();
+      if(state.parentPin && input !== state.parentPin){
+        showToast("PINがちがう");
+        sfxWrong();
+        return;
+      }
+      state.parentUnlocked = true;
+      document.getElementById("parentLockedBox").classList.add("hide");
+      document.getElementById("parentPanel").classList.remove("hide");
+      renderParentPanel();
+      showToast("管理画面を開きました");
+    }
+
+    function getMathList(){
+      if(state.settings.difficulty === "easy") return DATA.math_easy;
+      if(state.settings.difficulty === "hard") return DATA.math_hard;
+      return DATA.math_normal;
+    }
+    function getMemoryList(){
+      if(state.settings.difficulty === "easy") return DATA.memory_easy;
+      if(state.settings.difficulty === "hard") return DATA.memory_hard;
+      return DATA.memory_normal;
+    }
+
+    function startGame(name){
+      state.currentGame = name;
+      state.game.index = 0;
+      state.game.score = 0;
+      state.game.flipped = [];
+      state.game.matched = 0;
+      state.game.lock = false;
+      if(name === "hiragana"){
+        state.game.list = [...DATA.hiragana];
+        document.getElementById("gameTitle").textContent = "🔤 ひらがな";
+        renderQuiz();
+      }else if(name === "math"){
+        state.game.list = [...getMathList()];
+        document.getElementById("gameTitle").textContent = "➕ すうじ";
+        renderQuiz();
+      }else if(name === "shapes"){
+        state.game.list = [...DATA.shapes];
+        document.getElementById("gameTitle").textContent = "🟦 かたち";
+        renderQuiz();
+      }else if(name === "memory"){
+        document.getElementById("gameTitle").textContent = "🧠 きおく";
+        startMemoryGame();
+      }
+      showSection("game");
+    }
+    function restartCurrentGame(){ if(state.currentGame) startGame(state.currentGame); }
+    function setGameProgress(v){ document.getElementById("gameProgress").style.width = v + "%"; }
+
+    function renderQuiz(){
+      const total = state.game.list.length;
+      const item = state.game.list[state.game.index];
+      setGameProgress((state.game.index / total) * 100);
+      document.getElementById("gameArea").innerHTML = `
+        <div class="question">
+          ${item.prompt}
+          ${item.subtitle ? `<span class="sub">${item.subtitle}</span>` : ""}
+        </div>
+        <div class="choices">
+          ${shuffle(item.choices).map(choice => `
+            <button class="choice ${String(choice).length > 2 ? 'word' : ''}" onclick="checkQuizAnswer(${JSON.stringify(String(choice))})">${choice}</button>
+          `).join("")}
+        </div>
+        <div id="gameMessage" class="message"></div>
+      `;
+      speak(item.prompt.replaceAll("？",""));
+    }
+
+    function rewardSuccess(type, coins=3, xp=22){
+      state.combo += 1;
+      state.stars += 1;
+      state.coins += coins + Math.min(2, Math.floor(state.combo / 3));
+      addXp(xp);
+      addDailyRecord(type, coins);
+      checkBadges();
+      updateTop();
+    }
+    function punishFail(){ state.combo = 0; updateTop(); }
+
+    function checkQuizAnswer(choice){
+      const item = state.game.list[state.game.index];
+      const msg = document.getElementById("gameMessage");
+      state.answered += 1;
+      if(choice === item.answer){
+        state.correct += 1;
+        state.game.score += 1;
+        rewardSuccess(state.currentGame, 3, 20);
+        msg.className = "message good";
+        msg.textContent = "⭕ せいかい！";
+        sfxWin();
+        if(state.settings.sfx) speak("せいかい");
+        setTimeout(() => {
+          state.game.index += 1;
+          if(state.game.index < state.game.list.length) renderQuiz();
+          else finishQuiz();
+        }, 650);
+      }else{
+        punishFail();
+        msg.className = "message bad";
+        msg.textContent = "❌ もういちど かんがえよう";
+        sfxWrong();
+        if(state.settings.sfx) speak("ちがうよ");
+      }
+    }
+
+    function finishQuiz(){
+      setGameProgress(100);
+      state.clears += 1;
+      state.coins += 5;
+      state.stars += 2;
+      addXp(30);
+      checkBadges();
+      updateTop();
+      const total = state.game.list.length;
+      document.getElementById("gameArea").innerHTML = `
+        <div class="result">
+          <div class="big">${state.game.score} / ${total}</div>
+          <div class="message good">🎉 クリア！ よくできました！</div>
+          <div class="reward-box">
+            <div class="reward">🪙 +5 クリアボーナス</div>
+            <div class="reward">⭐ +2 ほし</div>
+            <div class="reward">✨ XP ボーナス</div>
+          </div>
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px">
+            <button class="gold" onclick="restartCurrentGame()">もういちど</button>
+            <button class="primary" onclick="showSection('shop')">ショップへ</button>
+          </div>
+        </div>
+      `;
+      sfxLevel();
+      if(state.settings.sfx) speak("クリア おめでとう");
+    }
+
+    function startMemoryGame(){
+      const list = shuffle(getMemoryList());
+      state.game.memoryCards = list.map((emoji, i) => ({ id:i, emoji, open:false, matched:false }));
+      state.game.flipped = [];
+      state.game.matched = 0;
+      state.game.lock = false;
+      renderMemoryGame();
+      speak("おなじ えを さがそう");
+    }
+    function renderMemoryGame(){
+      const totalPairs = state.game.memoryCards.length / 2;
+      const donePairs = state.game.matched / 2;
+      setGameProgress((donePairs / totalPairs) * 100);
+      document.getElementById("gameArea").innerHTML = `
+        <div class="question">おなじ えを 2まい そろえよう！<span class="sub">きおくりょく チャレンジ</span></div>
+        <div class="memory-grid">
+          ${state.game.memoryCards.map((card, i) => `
+            <div class="memory-card ${(!card.open && !card.matched) ? 'hidden' : ''}" onclick="flipCard(${i})">
+              ${(card.open || card.matched) ? card.emoji : '？'}
+            </div>
+          `).join("")}
+        </div>
+        <div id="gameMessage" class="message"></div>
+      `;
+    }
+    function flipCard(index){
+      if(state.game.lock) return;
+      const card = state.game.memoryCards[index];
+      if(card.open || card.matched) return;
+      card.open = true;
+      state.game.flipped.push(index);
+      renderMemoryGame();
+
+      if(state.game.flipped.length === 2){
+        state.game.lock = true;
+        const [a,b] = state.game.flipped;
+        const A = state.game.memoryCards[a];
+        const B = state.game.memoryCards[b];
+        const msg = document.getElementById("gameMessage");
+        if(A.emoji === B.emoji){
+          A.matched = true; B.matched = true;
+          state.game.flipped = [];
+          state.game.matched += 2;
+          state.pairCount += 1;
+          rewardSuccess("きおく", 4, 18);
+          msg.className = "message good";
+          msg.textContent = "⭕ ペア せいこう！";
+          sfxWin();
+          state.game.lock = false;
+          renderMemoryGame();
+          if(state.game.matched === state.game.memoryCards.length){
+            setTimeout(finishMemoryGame, 500);
+          }
+        }else{
+          punishFail();
+          msg.className = "message bad";
+          msg.textContent = "❌ ちがった！";
+          sfxWrong();
+          setTimeout(() => {
+            A.open = false; B.open = false;
+            state.game.flipped = [];
+            state.game.lock = false;
+            renderMemoryGame();
+          }, 850);
+        }
+      }
+    }
+    function finishMemoryGame(){
+      setGameProgress(100);
+      state.clears += 1;
+      state.coins += 8;
+      state.stars += 3;
+      addXp(36);
+      addDailyRecord("きおく", 8);
+      checkBadges();
+      updateTop();
+      document.getElementById("gameArea").innerHTML = `
+        <div class="result">
+          <div class="big">クリア！</div>
+          <div class="message good">🧠 きおくりょく ばっちり！</div>
+          <div class="reward-box">
+            <div class="reward">🪙 +8 クリアボーナス</div>
+            <div class="reward">⭐ +3 ほし</div>
+            <div class="reward">🧠 ペア達成</div>
+          </div>
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px">
+            <button class="gold" onclick="restartCurrentGame()">もういちど</button>
+            <button class="primary" onclick="showSection('badges')">バッジをみる</button>
+          </div>
+        </div>
+      `;
+      sfxLevel();
+    }
+
+    function bindSettings(){
+      document.getElementById("toggleVoice").addEventListener("change", e => {
+        state.settings.voice = e.target.checked; updateTop(); showToast("音声を更新");
+      });
+      document.getElementById("toggleSfx").addEventListener("change", e => {
+        state.settings.sfx = e.target.checked; updateTop(); showToast("効果音を更新");
+      });
+      document.getElementById("toggleBgm").addEventListener("change", e => {
+        state.settings.bgm = e.target.checked;
+        if(state.settings.bgm) startBgm(); else stopBgm();
+        updateTop(); showToast("BGMを更新");
+      });
+      document.querySelectorAll('input[name="difficulty"]').forEach(r => {
+        r.addEventListener("change", e => {
+          state.settings.difficulty = e.target.value; updateTop(); showToast("難易度を更新");
+        });
+      });
+      document.getElementById("petSelect").addEventListener("change", e => {
+        document.getElementById("loginPetPreview").textContent = e.target.value;
+      });
+    }
+
+    function showInstallHelp(){
+      alert("iPhoneなら Safari の共有ボタン →『ホーム画面に追加』で使えます。公開先は HTTPS が必要です。");
+    }
+    function resetAllData(){
+      if(!confirm("ほんとうに ぜんぶ リセットする？")) return;
+      localStorage.removeItem(STORAGE_KEY);
+      location.reload();
+    }
+
+    async function registerSW(){
+      if('serviceWorker' in navigator){
+        try{ await navigator.serviceWorker.register('./service-worker.js'); }catch(e){}
+      }
+    }
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      showToast("ホーム画面に追加できます");
+    });
+
+    load();
+    bindSettings();
+    registerSW();
+
+    if(state.childName){
+      document.getElementById("loginScreen").classList.add("hide");
+      document.getElementById("mainApp").classList.remove("hide");
+      updateTop();
+      if(state.settings.bgm) startBgm();
+    }
+  </script>
+</body>
+</html>
