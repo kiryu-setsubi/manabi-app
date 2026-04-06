@@ -47,3 +47,107 @@ h1 {
 }
 </style>
 </head>
+
+<body>
+
+<h1>🎓 まなびアドベンチャー</h1>
+
+<div class="card">
+  <h2 id="question">問題</h2>
+  <div id="choices"></div>
+  <div id="msg" class="message"></div>
+</div>
+
+<script>
+let current = 0;
+let score = 0;
+
+const quiz = [
+  {
+    q:"りんごはどれ？",
+    choices:["🍎","🐶","🚗"],
+    answer:"🍎"
+  },
+  {
+    q:"ねこはどれ？",
+    choices:["🐱","🐟","🐸"],
+    answer:"🐱"
+  },
+  {
+    q:"2 + 3 は？",
+    choices:["4","5","6"],
+    answer:"5"
+  },
+  {
+    q:"5 - 2 は？",
+    choices:["2","3","4"],
+    answer:"3"
+  }
+];
+
+function renderQuiz(){
+  const q = quiz[current];
+
+  document.getElementById("question").innerText = q.q;
+  document.getElementById("msg").innerText = "";
+
+  const choicesDiv = document.getElementById("choices");
+  choicesDiv.innerHTML = "";
+
+  q.choices.forEach(choice => {
+    const btn = document.createElement("button");
+    btn.innerText = choice;
+    btn.className = "choice";
+
+    // ⭐ここが超重要（バグ修正ポイント）
+    btn.addEventListener("click", function(){
+      checkAnswer(choice);
+    });
+
+    choicesDiv.appendChild(btn);
+  });
+}
+
+function checkAnswer(choice){
+  const q = quiz[current];
+  const msg = document.getElementById("msg");
+
+  if(choice === q.answer){
+    msg.className = "message good";
+    msg.innerText = "⭕ せいかい！";
+    score++;
+
+    setTimeout(()=>{
+      current++;
+      if(current < quiz.length){
+        renderQuiz();
+      } else {
+        finishGame();
+      }
+    },600);
+
+  } else {
+    msg.className = "message bad";
+    msg.innerText = "❌ ちがう！";
+  }
+}
+
+function finishGame(){
+  document.querySelector(".card").innerHTML = `
+    <h2>🎉 クリア！</h2>
+    <p>スコア：${score} / ${quiz.length}</p>
+    <button class="choice" onclick="restart()">もう一回</button>
+  `;
+}
+
+function restart(){
+  current = 0;
+  score = 0;
+  location.reload();
+}
+
+renderQuiz();
+</script>
+
+</body>
+</html>
