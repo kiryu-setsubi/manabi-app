@@ -7,146 +7,171 @@
 
 <style>
 body {
-  font-family: sans-serif;
-  background:#0f172a;
-  color:#fff;
-  text-align:center;
   margin:0;
+  font-family:sans-serif;
+  background:#0b1437;
+  color:#fff;
 }
 
-h1 {
+.screen { display:none; }
+.active { display:block; }
+
+.container {
   padding:20px;
 }
 
-.choice {
-  display:block;
-  margin:10px auto;
-  padding:18px;
-  width:85%;
-  font-size:22px;
-  border-radius:14px;
-  border:none;
-  background:linear-gradient(135deg,#4f46e5,#06b6d4);
-  color:#fff;
+h1 {
+  text-align:center;
+  font-size:34px;
 }
 
-.message {
-  margin-top:15px;
+.card {
+  background:#1f2b4d;
+  padding:20px;
+  border-radius:20px;
+  margin-top:20px;
+}
+
+button {
+  width:100%;
+  padding:15px;
+  margin-top:10px;
+  border:none;
+  border-radius:15px;
+  font-size:20px;
+  color:#fff;
+  background:linear-gradient(135deg,#4f46e5,#06b6d4);
+  
+  /* 🔥超重要（タップバグ対策） */
+  position:relative;
+  z-index:10;
+  pointer-events:auto;
+}
+
+.choice {
   font-size:24px;
-  font-weight:bold;
 }
 
 .good { color:#22c55e; }
 .bad { color:#ef4444; }
 
-.card {
-  background:#1e293b;
-  margin:20px;
-  padding:20px;
-  border-radius:20px;
+.grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
 }
 </style>
 </head>
 
 <body>
 
-<h1>🎓 まなびアドベンチャー</h1>
+<!-- ログイン -->
+<div id="login" class="screen active container">
+  <h1>🎓 まなびアドベンチャー</h1>
 
-<div class="card">
-  <h2 id="question">問題</h2>
+  <div class="card">
+    <input id="name" placeholder="なまえ" style="width:100%;padding:10px;border-radius:10px;border:none;">
+    <button onclick="start()">スタート</button>
+  </div>
+</div>
+
+<!-- メイン -->
+<div id="main" class="screen container">
+  <h1 id="welcome"></h1>
+
+  <div class="card">
+    <p>コイン：<span id="coin">0</span></p>
+    <p>レベル：<span id="level">1</span></p>
+  </div>
+
+  <div class="card">
+    <button onclick="startGame()">クイズスタート</button>
+  </div>
+</div>
+
+<!-- ゲーム -->
+<div id="game" class="screen container">
+  <h1 id="question"></h1>
   <div id="choices"></div>
-  <div id="msg" class="message"></div>
+  <p id="msg"></p>
 </div>
 
 <script>
+let coin = 0;
+let level = 1;
 let current = 0;
-let score = 0;
 
 const quiz = [
-  {
-    q:"りんごはどれ？",
-    choices:["🍎","🐶","🚗"],
-    answer:"🍎"
-  },
-  {
-    q:"ねこはどれ？",
-    choices:["🐱","🐟","🐸"],
-    answer:"🐱"
-  },
-  {
-    q:"2 + 3 は？",
-    choices:["4","5","6"],
-    answer:"5"
-  },
-  {
-    q:"5 - 2 は？",
-    choices:["2","3","4"],
-    answer:"3"
-  }
+  {q:"りんごはどれ？", choices:["🍎","🐶","🚗"], a:"🍎"},
+  {q:"ねこはどれ？", choices:["🐱","🐟","🐸"], a:"🐱"},
+  {q:"2+2は？", choices:["3","4","5"], a:"4"}
 ];
 
-function renderQuiz(){
-  const q = quiz[current];
-
-  document.getElementById("question").innerText = q.q;
-  document.getElementById("msg").innerText = "";
-
-  const choicesDiv = document.getElementById("choices");
-  choicesDiv.innerHTML = "";
-
-  q.choices.forEach(choice => {
-    const btn = document.createElement("button");
-    btn.innerText = choice;
-    btn.className = "choice";
-
-    // ⭐ここが超重要（バグ修正ポイント）
-    btn.addEventListener("click", function(){
-      checkAnswer(choice);
-    });
-
-    choicesDiv.appendChild(btn);
-  });
+function start(){
+  const name = document.getElementById("name").value || "プレイヤー";
+  document.getElementById("welcome").innerText = name;
+  show("main");
 }
 
-function checkAnswer(choice){
-  const q = quiz[current];
-  const msg = document.getElementById("msg");
+function show(id){
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
 
-  if(choice === q.answer){
-    msg.className = "message good";
-    msg.innerText = "⭕ せいかい！";
-    score++;
+function startGame(){
+  current = 0;
+  show("game");
+  render();
+}
+
+function render(){
+  const q = quiz[current];
+  document.getElementById("question").innerText = q.q;
+
+  const box = document.getElementById("choices");
+  box.innerHTML = "";
+
+  q.choices.forEach(c=>{
+    const btn = document.createElement("button");
+    btn.className="choice";
+    btn.innerText=c;
+
+    // 🔥タップバグ完全対策
+    btn.addEventListener("click", ()=>{
+      answer(c);
+    });
+
+    box.appendChild(btn);
+  });
+
+  document.getElementById("msg").innerText="";
+}
+
+function answer(c){
+  const q = quiz[current];
+
+  if(c===q.a){
+    coin+=5;
+    document.getElementById("msg").innerText="⭕せいかい！";
+    document.getElementById("msg").className="good";
 
     setTimeout(()=>{
       current++;
-      if(current < quiz.length){
-        renderQuiz();
-      } else {
-        finishGame();
+      if(current<quiz.length){
+        render();
+      }else{
+        level++;
+        show("main");
+        document.getElementById("coin").innerText=coin;
+        document.getElementById("level").innerText=level;
       }
-    },600);
+    },500);
 
-  } else {
-    msg.className = "message bad";
-    msg.innerText = "❌ ちがう！";
+  }else{
+    document.getElementById("msg").innerText="❌ちがう！";
+    document.getElementById("msg").className="bad";
   }
 }
-
-function finishGame(){
-  document.querySelector(".card").innerHTML = `
-    <h2>🎉 クリア！</h2>
-    <p>スコア：${score} / ${quiz.length}</p>
-    <button class="choice" onclick="restart()">もう一回</button>
-  `;
-}
-
-function restart(){
-  current = 0;
-  score = 0;
-  location.reload();
-}
-
-renderQuiz();
 </script>
 
 </body>
