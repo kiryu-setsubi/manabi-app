@@ -1,880 +1,489 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>わくわく まなびアプリ DX</title>
-  <style>
-    :root{
-      --bg1:#fff8e7;
-      --bg2:#e8f7ff;
-      --card:#ffffff;
-      --text:#24324a;
-      --accent:#ff9f1c;
-      --accent2:#2ec4b6;
-      --accent3:#6c63ff;
-      --good:#24b36b;
-      --bad:#ef476f;
-      --gold:#f6b100;
-      --shadow:0 12px 30px rgba(36,50,74,.12);
-      --radius:24px;
-    }
-
-    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-
-    body{
-      margin:0;
-      font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif;
-      color:var(--text);
-      background:linear-gradient(135deg,var(--bg1),var(--bg2));
-      min-height:100vh;
-    }
-
-    .wrap{
-      max-width:1000px;
-      margin:0 auto;
-      padding:20px 16px 40px;
-    }
-
-    .header{
-      text-align:center;
-      padding:8px 0 18px;
-    }
-
-    .title{
-      margin:8px 0 6px;
-      font-size:clamp(28px,5vw,44px);
-      font-weight:900;
-      letter-spacing:.03em;
-    }
-
-    .subtitle{
-      font-size:clamp(14px,2.8vw,18px);
-      opacity:.85;
-    }
-
-    .statusbar{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-      justify-content:center;
-      margin:18px 0 22px;
-    }
-
-    .pill{
-      background:rgba(255,255,255,.85);
-      border:2px solid rgba(255,255,255,.8);
-      box-shadow:var(--shadow);
-      border-radius:999px;
-      padding:10px 16px;
-      font-weight:800;
-    }
-
-    .screen{display:none}
-    .screen.active{display:block}
-
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
-      gap:16px;
-      margin-top:18px;
-    }
-
-    .menu-card{
-      background:var(--card);
-      border-radius:var(--radius);
-      padding:18px;
-      box-shadow:var(--shadow);
-      border:3px solid rgba(255,255,255,.75);
-      cursor:pointer;
-      user-select:none;
-      transition:transform .15s ease;
-    }
-
-    .menu-card:active{transform:scale(.99)}
-
-    .menu-emoji{
-      font-size:44px;
-      margin-bottom:10px;
-    }
-
-    .menu-title{
-      font-size:24px;
-      font-weight:900;
-      margin-bottom:6px;
-    }
-
-    .menu-desc{
-      line-height:1.6;
-      opacity:.9;
-      font-size:15px;
-    }
-
-    .panel{
-      background:var(--card);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      padding:18px;
-      border:3px solid rgba(255,255,255,.75);
-    }
-
-    .top-actions{
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      align-items:center;
-      margin-bottom:16px;
-      flex-wrap:wrap;
-    }
-
-    .game-title{
-      font-size:clamp(24px,4vw,34px);
-      font-weight:900;
-    }
-
-    .button-row{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    button{
-      border:none;
-      border-radius:18px;
-      padding:14px 18px;
-      font-size:18px;
-      font-weight:900;
-      cursor:pointer;
-      box-shadow:0 8px 18px rgba(0,0,0,.08);
-      position:relative;
-      z-index:10;
-      pointer-events:auto;
-      touch-action:manipulation;
-    }
-
-    button.primary{background:var(--accent); color:#fff}
-    button.secondary{background:var(--accent2); color:#fff}
-    button.purple{background:var(--accent3); color:#fff}
-    button.white{background:#fff; color:var(--text)}
-    button.gold{background:linear-gradient(135deg,#ffd76a,#f6b100); color:#533600}
-
-    button.choice{
-      min-height:78px;
-      font-size:clamp(28px,5vw,42px);
-      background:linear-gradient(135deg,#5b53ff,#21c8e8);
-      color:#fff;
-      width:100%;
-      position:relative;
-      z-index:20;
-      pointer-events:auto;
-      touch-action:manipulation;
-    }
-
-    .question{
-      text-align:center;
-      font-weight:900;
-      font-size:clamp(28px,5vw,54px);
-      margin:18px 0 20px;
-      line-height:1.4;
-    }
-
-    .choices{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-      gap:14px;
-    }
-
-    .center{text-align:center}
-
-    .big{
-      font-size:clamp(40px,9vw,90px);
-      font-weight:900;
-      line-height:1.1;
-    }
-
-    .message{
-      margin-top:16px;
-      min-height:36px;
-      font-size:clamp(18px,3vw,24px);
-      text-align:center;
-      font-weight:900;
-    }
-
-    .good{color:var(--good)}
-    .bad{color:var(--bad)}
-
-    .progress{
-      height:16px;
-      background:#eef2f7;
-      border-radius:999px;
-      overflow:hidden;
-      margin:8px 0 18px;
-    }
-
-    .progress > div{
-      height:100%;
-      width:0%;
-      background:linear-gradient(90deg,var(--accent),var(--accent2));
-      transition:width .25s ease;
-    }
-
-    .memory-grid{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:10px;
-      margin-top:16px;
-    }
-
-    .memory-card{
-      aspect-ratio:1/1;
-      border-radius:18px;
-      font-size:clamp(22px,5vw,44px);
-      font-weight:900;
-      background:#fff;
-      border:3px solid #edf1f7;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      cursor:pointer;
-      user-select:none;
-      box-shadow:0 8px 18px rgba(0,0,0,.06);
-      position:relative;
-      z-index:20;
-      pointer-events:auto;
-      touch-action:manipulation;
-    }
-
-    .memory-card.hidden{
-      background:linear-gradient(135deg,#ffd166,#ff9f1c);
-      color:transparent;
-    }
-
-    .result-box{
-      text-align:center;
-      padding:18px;
-      margin-top:18px;
-      border-radius:20px;
-      background:#f8fbff;
-      border:2px dashed #d7e5f3;
-    }
-
-    .stars{
-      font-size:clamp(28px,5vw,46px);
-      letter-spacing:.1em;
-      margin-top:8px;
-    }
-
-    .footer-note{
-      text-align:center;
-      margin-top:18px;
-      opacity:.75;
-      font-weight:700;
-    }
-
-    .boss-badge{
-      display:inline-block;
-      margin-bottom:10px;
-      background:linear-gradient(135deg,#ff7a18,#ffb703);
-      color:#fff;
-      font-weight:900;
-      padding:8px 14px;
-      border-radius:999px;
-      box-shadow:0 8px 16px rgba(255,122,24,.28);
-    }
-
-    .reward-list{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-      gap:12px;
-      margin-top:14px;
-    }
-
-    .reward-item{
-      background:#fff;
-      border:2px solid #e9eef7;
-      border-radius:18px;
-      padding:14px;
-      font-weight:900;
-      text-align:center;
-    }
-
-    .timer-wrap{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      margin-bottom:12px;
-      flex-wrap:wrap;
-    }
-
-    .timer-label{
-      font-weight:900;
-    }
-
-    .timer-bar{
-      flex:1;
-      min-width:180px;
-      height:14px;
-      background:#eef2f7;
-      border-radius:999px;
-      overflow:hidden;
-    }
-
-    .timer-bar > div{
-      height:100%;
-      width:100%;
-      background:linear-gradient(90deg,#22c55e,#f59e0b,#ef4444);
-      transition:width .25s linear;
-    }
-
-    .boss-panel{
-      background:linear-gradient(135deg,#fff7ed,#fff);
-      border:2px solid #fed7aa;
-      border-radius:20px;
-      padding:16px;
-      margin-bottom:14px;
-    }
-
-    @media (max-width:640px){
-      .memory-grid{gap:8px}
-      button{font-size:16px;padding:13px 16px}
-      .menu-title{font-size:22px}
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#4338ca">
+<title>ダイノクエスト</title>
+<style>
+:root{--bg1:#0a1028;--bg2:#142a63;--panel:#ffffff;--panel2:#f7faff;--text:#20304f;--muted:#64748b;--line:#e6eef8;--primary:#4f46e5;--primary2:#06b6d4;--good:#16a34a;--bad:#ef4444;--gold:#f59e0b;--shadow:0 18px 48px rgba(15,23,42,.18);--radius:26px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif;min-height:100vh;color:#fff;background:radial-gradient(circle at top left, rgba(125,211,252,.18) 0, transparent 24%),radial-gradient(circle at top right, rgba(253,230,138,.18) 0, transparent 18%),linear-gradient(180deg,var(--bg1),var(--bg2))}
+button,input{font:inherit}
+.app{max-width:1180px;margin:0 auto;padding:14px}
+.screen{display:none}.screen.active{display:block}
+.card{background:linear-gradient(180deg,var(--panel),var(--panel2));color:var(--text);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.22)}
+.hero{padding:22px;position:relative;overflow:hidden}
+.hero:before,.hero:after{content:"";position:absolute;border-radius:999px;filter:blur(16px);opacity:.25}
+.hero:before{width:210px;height:210px;background:#7dd3fc;left:-70px;top:-80px}
+.hero:after{width:220px;height:220px;background:#fde68a;right:-80px;bottom:-90px}
+.hero-inner{position:relative;z-index:1}
+.title{font-size:clamp(34px,7vw,62px);font-weight:1000;line-height:1.04;text-align:center;margin:6px 0 10px}
+.subtitle{max-width:780px;margin:0 auto;text-align:center;color:var(--muted);line-height:1.85;font-weight:700}
+.pillbar{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:18px}
+.pill{background:#fff;color:#1f2a44;border-radius:999px;padding:10px 14px;font-weight:1000;box-shadow:0 8px 18px rgba(0,0,0,.08)}
+.btn{appearance:none;border:none;border-radius:18px;padding:14px 18px;color:#fff;cursor:pointer;background:linear-gradient(135deg,var(--primary),var(--primary2));box-shadow:0 10px 24px rgba(0,0,0,.12);font-weight:1000;position:relative;z-index:5;pointer-events:auto;touch-action:manipulation}
+.btn.secondary{background:#fff;color:var(--text);border:1px solid var(--line)}
+.btn.gold{background:linear-gradient(135deg,#ffd76a,var(--gold));color:#5b3d00}
+.btn.red{background:linear-gradient(135deg,#ef4444,#dc2626)}
+.btn.small{padding:10px 14px;border-radius:14px;font-size:14px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.center{text-align:center}
+.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}.mt24{margin-top:24px}
+.label{display:block;font-weight:1000;margin-bottom:8px;color:#334155}
+.input{width:100%;border:1px solid var(--line);border-radius:16px;padding:14px 15px;background:#fff;color:var(--text);outline:none}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.panel{padding:18px}
+.menu-grid{display:grid;grid-template-columns:290px 1fr;gap:16px;margin-top:16px}
+.sidebar{padding:14px}
+.nav-btn{width:100%;text-align:left;padding:14px 16px;margin-bottom:10px;border-radius:16px;border:1px solid #dbe6f5;background:#fff;color:var(--text);cursor:pointer;font-weight:1000;box-shadow:0 8px 18px rgba(15,23,42,.05)}
+.nav-btn.active{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;border-color:transparent}
+.main-panel{min-height:680px}
+.panel-title{font-size:clamp(24px,4vw,38px);font-weight:1000;margin:0 0 10px;color:var(--text)}
+.muted{color:var(--muted)}
+.dino-select{padding:18px;border-radius:22px;background:#fff;border:2px solid #eaf0f9;box-shadow:0 10px 22px rgba(15,23,42,.06);text-align:center;cursor:pointer}
+.dino-select.active{border-color:#7c3aed;box-shadow:0 0 0 4px rgba(124,58,237,.12),0 12px 24px rgba(15,23,42,.08)}
+.dino-emoji{font-size:58px;line-height:1}.dino-name{font-size:24px;font-weight:1000;margin-top:10px}.dino-desc{font-size:14px;color:var(--muted);line-height:1.7;margin-top:8px}
+.top-cards{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;margin-top:16px}
+.section-block{background:#fff;border-radius:22px;padding:18px;border:1px solid #eaf0f9;box-shadow:0 10px 22px rgba(15,23,42,.05);margin-top:14px}
+.dino-box{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;padding:16px;border-radius:20px;background:#fff;border:1px solid #ebeff7}
+.dino-big{font-size:86px;line-height:1}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.stat{padding:14px;border-radius:18px;background:#fff;text-align:center;border:1px solid #ebeff7;box-shadow:0 8px 18px rgba(15,23,42,.04)}
+.stat .n{display:block;font-size:28px;font-weight:1000;line-height:1;margin-bottom:6px}
+.xpbar,.bar{width:100%;height:14px;background:#ebf0f8;border-radius:999px;overflow:hidden}
+.xpfill,.barfill{height:100%;width:0%;background:linear-gradient(90deg,var(--gold),#fde68a);transition:width .25s ease}
+.study-grid,.inventory-grid,.adventure-grid,.reward-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:12px}
+.tile{padding:16px;border-radius:20px;background:#fff;border:1px solid #eaf0f9;box-shadow:0 8px 20px rgba(15,23,42,.05)}
+.tile .emoji{font-size:40px;line-height:1}.tile .name{font-size:22px;font-weight:1000;margin-top:10px}.tile .desc{font-size:14px;color:var(--muted);line-height:1.7;margin-top:8px}
+.question{font-size:clamp(28px,5vw,52px);line-height:1.35;text-align:center;font-weight:1000;color:var(--text);margin:18px 0 16px}
+.subq{display:block;font-size:16px;color:var(--muted);margin-top:8px;font-weight:800}
+.choices{display:grid;gap:12px;margin-top:10px}
+.choice{width:100%;min-height:78px;border:none;border-radius:18px;background:linear-gradient(135deg,#5b53ff,#21c8e8);color:#fff;font-size:clamp(24px,4vw,36px);font-weight:1000;cursor:pointer;touch-action:manipulation}
+.msg{min-height:34px;margin-top:14px;text-align:center;font-size:22px;font-weight:1000}
+.good{color:var(--good)} .bad{color:var(--bad)}
+.study-header{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.timer-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.timer-box{flex:1;min-width:160px}
+.boss-box{padding:16px;border-radius:18px;background:linear-gradient(135deg,#fff7ed,#fff);border:2px solid #fdba74;text-align:center;margin-bottom:12px}
+.memory-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+.memory-card{aspect-ratio:1/1;border:none;border-radius:18px;background:linear-gradient(135deg,#ffd166,#ff9f1c);color:transparent;font-size:34px;font-weight:1000;cursor:pointer;touch-action:manipulation}
+.memory-card.show,.memory-card.done{background:#fff;color:#1f2a44;border:2px solid #e7edf7}
+.memory-card.done{background:linear-gradient(135deg,#dcfce7,#fff);border-color:#86efac}
+.battle-log{background:#0f172a;color:#fff;border-radius:18px;padding:14px;min-height:120px;font-weight:800;line-height:1.8;white-space:pre-line}
+.skill-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:14px}
+.reward-chip{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 14px;border-radius:999px;background:#fff;border:1px solid #e7edf7;font-weight:1000;margin:4px}
+table{width:100%;border-collapse:collapse;margin-top:10px;background:#fff;border-radius:18px;overflow:hidden}
+th,td{padding:12px 10px;border-bottom:1px solid #edf2fa;text-align:left;font-size:14px;color:var(--text)}
+th{background:#f8fbff;color:#64748b;font-size:12px;letter-spacing:.06em}
+.hide{display:none !important}.footer-space{height:20px}
+@media (max-width:920px){.menu-grid,.top-cards{grid-template-columns:1fr}}
+@media (max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}.memory-grid{gap:8px}.question{font-size:30px}.dino-big{font-size:72px}}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="header">
-      <div class="title">🌟 わくわく まなびアプリ DX 🌟</div>
-      <div class="subtitle">レベルアップ・タイマー・ボス問題・ごほうびつき！</div>
-    </div>
-
-    <div class="statusbar">
-      <div class="pill">🏆 ほし: <span id="starCount">0</span></div>
-      <div class="pill">🎯 れんぞく: <span id="comboCount">0</span></div>
-      <div class="pill">🎉 クリア: <span id="clearCount">0</span></div>
-      <div class="pill">⬆️ レベル: <span id="levelCount">1</span></div>
-    </div>
-
-    <section id="homeScreen" class="screen active">
-      <div class="grid">
-        <div class="menu-card" data-game="hiragana">
-          <div class="menu-emoji">🔤</div>
-          <div class="menu-title">ひらがな</div>
-          <div class="menu-desc">ことばの さいしょの もじを あてよう！</div>
-        </div>
-
-        <div class="menu-card" data-game="math">
-          <div class="menu-emoji">➕</div>
-          <div class="menu-title">すうじ</div>
-          <div class="menu-desc">たしざん・ひきざんを どんどんクリア！</div>
-        </div>
-
-        <div class="menu-card" data-game="memory">
-          <div class="menu-emoji">🧠</div>
-          <div class="menu-title">きおくゲーム</div>
-          <div class="menu-desc">カードを そろえて きおくりょくアップ！</div>
-        </div>
-      </div>
-
-      <div class="panel" style="margin-top:18px;">
-        <div class="game-title center">🎮 ゲームっぽくなったポイント</div>
-        <p class="center" style="font-size:18px;line-height:1.8;">
-          レベルが上がると むずかしくなる！<br>
-          タイマーつき！ たまにボス問題！ ごほうびももらえる！
-        </p>
-        <div class="footer-note">開いたらすぐ遊べる版のまま、ゲーム要素を強化してます。</div>
-      </div>
-    </section>
-
-    <section id="gameScreen" class="screen">
-      <div class="panel">
-        <div class="top-actions">
-          <div class="game-title" id="gameTitle">ゲーム</div>
-          <div class="button-row">
-            <button class="white" id="homeBtn">🏠 もどる</button>
-            <button class="secondary" id="retryBtn">🔄 もういちど</button>
-          </div>
-        </div>
-
-        <div class="timer-wrap" id="timerWrap">
-          <div class="timer-label">⏰ のこり: <span id="timeText">10</span>秒</div>
-          <div class="timer-bar"><div id="timerBar"></div></div>
-        </div>
-
-        <div class="progress"><div id="progressBar"></div></div>
-        <div id="gameArea"></div>
-      </div>
-    </section>
-  </div>
-
-  <script>
-    const appState = {
-      stars: 0,
-      combo: 0,
-      clears: 0,
-      level: 1,
-      currentGame: null,
-      unlockedRewards: []
-    };
-
-    const gameState = {
-      index: 0,
-      score: 0,
-      flipped: [],
-      matched: 0,
-      lock: false,
-      memoryCards: [],
-      currentQuestion: null,
-      isBoss: false,
-      timeLeft: 10,
-      timerId: null
-    };
-
-    const homeScreen = document.getElementById("homeScreen");
-    const gameScreen = document.getElementById("gameScreen");
-    const gameArea = document.getElementById("gameArea");
-    const gameTitle = document.getElementById("gameTitle");
-    const progressBar = document.getElementById("progressBar");
-    const timerWrap = document.getElementById("timerWrap");
-    const timerBar = document.getElementById("timerBar");
-    const timeText = document.getElementById("timeText");
-
-    function updateStatus(){
-      document.getElementById("starCount").textContent = appState.stars;
-      document.getElementById("comboCount").textContent = appState.combo;
-      document.getElementById("clearCount").textContent = appState.clears;
-      document.getElementById("levelCount").textContent = appState.level;
-    }
-
-    function setProgress(value){
-      progressBar.style.width = Math.max(0, Math.min(100, value)) + "%";
-    }
-
-    function shuffle(arr){
-      return [...arr].sort(() => Math.random() - 0.5);
-    }
-
-    function goHome(){
-      stopTimer();
-      appState.currentGame = null;
-      homeScreen.classList.add("active");
-      gameScreen.classList.remove("active");
-      setProgress(0);
-    }
-
-    function openGame(name){
-      stopTimer();
-      appState.currentGame = name;
-      gameState.index = 0;
-      gameState.score = 0;
-      gameState.flipped = [];
-      gameState.matched = 0;
-      gameState.lock = false;
-      gameState.isBoss = false;
-
-      homeScreen.classList.remove("active");
-      gameScreen.classList.add("active");
-
-      if(name === "hiragana"){
-        gameTitle.textContent = "🔤 ひらがなゲーム";
-        renderQuiz("hiragana");
-      } else if(name === "math"){
-        gameTitle.textContent = "➕ すうじゲーム";
-        renderQuiz("math");
-      } else if(name === "memory"){
-        gameTitle.textContent = "🧠 きおくゲーム";
-        startMemoryGame();
-      }
-    }
-
-    function restartCurrentGame(){
-      if(appState.currentGame){
-        openGame(appState.currentGame);
-      }
-    }
-
-    function rewardStars(n = 1){
-      appState.stars += n;
-      updateStatus();
-      checkRewardUnlock();
-    }
-
-    function checkRewardUnlock(){
-      const rewards = [
-        { need: 5, name: "🍬 キャンディ ごほうび" },
-        { need: 12, name: "👑 キラキラ かんむり" },
-        { need: 20, name: "🧸 スペシャル おもちゃ" },
-        { need: 35, name: "🚀 さいきょう ロケット" }
-      ];
-
-      rewards.forEach(r => {
-        if(appState.stars >= r.need && !appState.unlockedRewards.includes(r.name)){
-          appState.unlockedRewards.push(r.name);
-        }
-      });
-    }
-
-    function getDifficultyLevel(){
-      return Math.min(8, Math.floor((appState.level - 1) / 2) + 1);
-    }
-
-    function getTimerSeconds(){
-      return Math.max(5, 11 - getDifficultyLevel());
-    }
-
-    function startTimer(onTimeout){
-      stopTimer();
-      gameState.timeLeft = getTimerSeconds();
-      updateTimerUI();
-
-      gameState.timerId = setInterval(() => {
-        gameState.timeLeft -= 1;
-        updateTimerUI();
-
-        if(gameState.timeLeft <= 0){
-          stopTimer();
-          onTimeout();
-        }
-      }, 1000);
-    }
-
-    function stopTimer(){
-      if(gameState.timerId){
-        clearInterval(gameState.timerId);
-        gameState.timerId = null;
-      }
-    }
-
-    function updateTimerUI(){
-      timeText.textContent = gameState.timeLeft;
-      const total = getTimerSeconds();
-      const percent = (gameState.timeLeft / total) * 100;
-      timerBar.style.width = percent + "%";
-    }
-
-    function generateHiraganaQuestion(isBoss = false){
-      const wordsEasy = ["りんご","ねこ","いぬ","もも","さかな","やま","かわ","くるま"];
-      const wordsHard = ["れいぞうこ","しんかんせん","たこやき","でんしゃ","おにぎり","たまごやき"];
-      const useHard = getDifficultyLevel() >= 4 || isBoss;
-      const words = useHard ? wordsHard : wordsEasy;
-
-      const word = words[Math.floor(Math.random() * words.length)];
-      const correct = word[0];
-      const pool = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわ";
-      let count = isBoss ? 4 : 3;
-      let choices = [correct];
-
-      while(choices.length < count){
-        const c = pool[Math.floor(Math.random() * pool.length)];
-        if(!choices.includes(c)) choices.push(c);
-      }
-
-      return {
-        prompt: `「${word}」の さいしょの もじは？`,
-        answer: correct,
-        choices: shuffle(choices),
-        boss: isBoss
-      };
-    }
-
-    function generateMathQuestion(isBoss = false){
-      const diff = getDifficultyLevel();
-      const max = isBoss ? 20 : (diff <= 2 ? 9 : diff <= 4 ? 12 : 20);
-
-      let a = Math.floor(Math.random() * max) + 1;
-      let b = Math.floor(Math.random() * max) + 1;
-      const isPlus = Math.random() > 0.45;
-
-      let answer;
-      let prompt;
-
-      if(isPlus){
-        answer = a + b;
-        prompt = `${a} + ${b} は？`;
-      } else {
-        if(a < b){
-          const t = a;
-          a = b;
-          b = t;
-        }
-        answer = a - b;
-        prompt = `${a} - ${b} は？`;
-      }
-
-      let count = isBoss ? 4 : 3;
-      let choices = [answer];
-
-      while(choices.length < count){
-        let fake = answer + Math.floor(Math.random() * 7) - 3;
-        if(fake < 0) fake = answer + 1;
-        if(!choices.includes(fake)) choices.push(fake);
-      }
-
-      return {
-        prompt,
-        answer: String(answer),
-        choices: shuffle(choices.map(String)),
-        boss: isBoss
-      };
-    }
-
-    function generateQuestion(type, isBoss = false){
-      if(type === "hiragana") return generateHiraganaQuestion(isBoss);
-      if(type === "math") return generateMathQuestion(isBoss);
-      return null;
-    }
-
-    function renderQuiz(type){
-      gameState.isBoss = ((gameState.index + 1) % 5 === 0);
-      const item = generateQuestion(type, gameState.isBoss);
-      gameState.currentQuestion = item;
-
-      const percent = ((gameState.index % 5) / 5) * 100;
-      setProgress(percent);
-
-      gameArea.innerHTML = `
-        ${item.boss ? `<div class="boss-panel center"><div class="boss-badge">🔥 ボス問題！</div><div>これに正解すると ごほうびアップ！</div></div>` : ""}
-        <div class="question">${item.prompt}</div>
-        <div id="choicesWrap" class="choices"></div>
-        <div class="message" id="quizMessage"></div>
-      `;
-
-      const choicesWrap = document.getElementById("choicesWrap");
-
-      item.choices.forEach(choice => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "choice";
-        btn.textContent = choice;
-        btn.addEventListener("click", () => checkQuizAnswer(type, choice));
-        choicesWrap.appendChild(btn);
-      });
-
-      timerWrap.style.display = "flex";
-      startTimer(() => {
-        const msg = document.getElementById("quizMessage");
-        msg.className = "message bad";
-        msg.textContent = "⏰ じかんぎれ！";
-        appState.combo = 0;
-        updateStatus();
-
-        setTimeout(() => {
-          gameState.index += 1;
-          renderQuiz(type);
-        }, 700);
-      });
-    }
-
-    function checkQuizAnswer(type, choice){
-      stopTimer();
-      const item = gameState.currentQuestion;
-      const msg = document.getElementById("quizMessage");
-
-      if(choice === item.answer){
-        appState.combo += 1;
-        gameState.score += 1;
-
-        const gain = item.boss ? 3 : 1;
-        rewardStars(gain);
-
-        msg.className = "message good";
-        msg.textContent = item.boss ? "👑 ボスクリア！" : "⭕ せいかい！";
-
-        setTimeout(() => {
-          gameState.index += 1;
-
-          if(item.boss){
-            finishQuiz(type, true);
-          } else {
-            renderQuiz(type);
-          }
-
-          updateStatus();
-        }, 600);
-
-      } else {
-        appState.combo = 0;
-        msg.className = "message bad";
-        msg.textContent = "❌ ちがうよ〜";
-        updateStatus();
-
-        setTimeout(() => {
-          gameState.index += 1;
-          renderQuiz(type);
-        }, 600);
-      }
-    }
-
-    function finishQuiz(type, bossClear = false){
-      setProgress(100);
-      appState.clears += 1;
-      if(bossClear){
-        appState.level += 1;
-      }
-      updateStatus();
-
-      const rewardsHtml = appState.unlockedRewards.length
-        ? appState.unlockedRewards.map(r => `<div class="reward-item">${r}</div>`).join("")
-        : `<div class="reward-item">まだ ごほうびなし</div>`;
-
-      gameArea.innerHTML = `
-        <div class="result-box">
-          <div class="big">${gameState.score}</div>
-          <div class="message good">${bossClear ? "🎉 ステージクリア！ レベルアップ！" : "🎉 クリア！"}</div>
-          <div class="stars">${bossClear ? "★★★" : "★★☆"}</div>
-          <div style="margin-top:12px;font-weight:900;">いまのレベル: ${appState.level}</div>
-          <div class="reward-list">${rewardsHtml}</div>
-          <div style="margin-top:16px;" class="button-row center">
-            <button class="primary" id="againBtn">もういちど</button>
-            <button class="purple" id="menuBtn">メニューへ</button>
-          </div>
-        </div>
-      `;
-
-      document.getElementById("againBtn").addEventListener("click", restartCurrentGame);
-      document.getElementById("menuBtn").addEventListener("click", goHome);
-    }
-
-    function startMemoryGame(){
-      stopTimer();
-      timerWrap.style.display = "none";
-
-      const pairs = Math.min(6, 4 + Math.floor((appState.level - 1) / 2));
-      const emojis = ["🐶","🐱","🐼","🦁","🐸","🦊"];
-      const selected = emojis.slice(0, pairs);
-      gameState.memoryCards = shuffle([...selected, ...selected]).map((emoji, index) => ({
-        id:index,
-        emoji,
-        open:false,
-        matched:false
-      }));
-
-      gameState.matched = 0;
-      gameState.flipped = [];
-      gameState.lock = false;
-      setProgress(0);
-      renderMemoryGame();
-    }
-
-    function renderMemoryGame(){
-      const totalPairs = gameState.memoryCards.length / 2;
-      const matchedPairs = gameState.matched / 2;
-      setProgress((matchedPairs / totalPairs) * 100);
-
-      const bossMode = matchedPairs + 1 === totalPairs;
-
-      gameArea.innerHTML = `
-        ${bossMode ? `<div class="boss-panel center"><div class="boss-badge">🔥 ラストボス！</div><div>さいごのペアを そろえよう！</div></div>` : ""}
-        <div class="question">おなじ えを 2まい そろえよう！</div>
-        <div id="memoryGrid" class="memory-grid"></div>
-        <div class="message" id="memoryMessage"></div>
-      `;
-
-      const memoryGrid = document.getElementById("memoryGrid");
-
-      gameState.memoryCards.forEach((card, i) => {
-        const cell = document.createElement("button");
-        cell.type = "button";
-        cell.className = "memory-card" + ((!card.open && !card.matched) ? " hidden" : "");
-        cell.textContent = (card.open || card.matched) ? card.emoji : "？";
-        cell.addEventListener("click", () => flipMemoryCard(i));
-        memoryGrid.appendChild(cell);
-      });
-    }
-
-    function flipMemoryCard(index){
-      if(gameState.lock) return;
-
-      const card = gameState.memoryCards[index];
-      if(card.open || card.matched) return;
-
-      card.open = true;
-      gameState.flipped.push(index);
-      renderMemoryGame();
-
-      if(gameState.flipped.length === 2){
-        gameState.lock = true;
-
-        const [a, b] = gameState.flipped;
-        const cardA = gameState.memoryCards[a];
-        const cardB = gameState.memoryCards[b];
-        const msg = document.getElementById("memoryMessage");
-
-        if(cardA.emoji === cardB.emoji){
-          const lastPair = gameState.matched + 2 === gameState.memoryCards.length;
-
-          cardA.matched = true;
-          cardB.matched = true;
-          gameState.matched += 2;
-          gameState.flipped = [];
-          appState.combo += 1;
-          rewardStars(lastPair ? 3 : 1);
-
-          msg.className = "message good";
-          msg.textContent = lastPair ? "👑 ラストペア！" : "⭕ そろった！";
-
-          gameState.lock = false;
-          renderMemoryGame();
-          updateStatus();
-
-          if(gameState.matched === gameState.memoryCards.length){
-            setTimeout(finishMemoryGame, 450);
-          }
-
-        } else {
-          appState.combo = 0;
-          msg.className = "message bad";
-          msg.textContent = "❌ ちがった！";
-          updateStatus();
-
-          setTimeout(() => {
-            cardA.open = false;
-            cardB.open = false;
-            gameState.flipped = [];
-            gameState.lock = false;
-            renderMemoryGame();
-          }, 700);
-        }
-      }
-    }
-
-    function finishMemoryGame(){
-      setProgress(100);
-      appState.clears += 1;
-      appState.level += 1;
-      rewardStars(2);
-      updateStatus();
-
-      const rewardsHtml = appState.unlockedRewards.length
-        ? appState.unlockedRewards.map(r => `<div class="reward-item">${r}</div>`).join("")
-        : `<div class="reward-item">まだ ごほうびなし</div>`;
-
-      gameArea.innerHTML = `
-        <div class="result-box">
-          <div class="big">クリア！</div>
-          <div class="message good">🧠 きおくりょく ばっちり！ レベルアップ！</div>
-          <div class="stars">★★★</div>
-          <div style="margin-top:12px;font-weight:900;">いまのレベル: ${appState.level}</div>
-          <div class="reward-list">${rewardsHtml}</div>
-          <div style="margin-top:16px;" class="button-row center">
-            <button class="primary" id="memoryAgainBtn">もういちど</button>
-            <button class="purple" id="memoryMenuBtn">メニューへ</button>
-          </div>
-        </div>
-      `;
-
-      document.getElementById("memoryAgainBtn").addEventListener("click", restartCurrentGame);
-      document.getElementById("memoryMenuBtn").addEventListener("click", goHome);
-    }
-
-    document.querySelectorAll(".menu-card").forEach(card => {
-      card.addEventListener("click", () => openGame(card.dataset.game));
-    });
-
-    document.getElementById("homeBtn").addEventListener("click", goHome);
-    document.getElementById("retryBtn").addEventListener("click", restartCurrentGame);
-
-    updateStatus();
-  </script>
+<div class="app">
+<section id="titleScreen" class="screen active">
+<div class="card hero"><div class="hero-inner">
+<div class="title">🦖 ダイノクエスト</div>
+<p class="subtitle">勉強してポイントをためて、恐竜を育てて、冒険して、ボスを倒す。<br>「強くしたいから勉強する」流れを作る、スマホ向け学習RPG。</p>
+<div class="pillbar"><div class="pill">📚 勉強で成長</div><div class="pill">🦖 恐竜育成</div><div class="pill">🗺 冒険</div><div class="pill">👹 ボス</div></div>
+<div class="center mt24"><button id="newGameBtn" class="btn">はじめる</button><button id="continueBtn" class="btn secondary">つづきから</button></div>
+</div></div>
+</section>
+
+<section id="setupScreen" class="screen">
+<div class="card panel">
+<h2 class="panel-title center">最初の相棒をえらぼう</h2>
+<p class="muted center">タイプで育ち方がちがうで。好きな恐竜を選んでスタート！</p>
+<div class="mt20"><label class="label" for="playerName">おなまえ</label><input id="playerName" class="input" placeholder="れい：はるき"></div>
+<div id="dinoSelectGrid" class="grid mt20"></div>
+<div class="center mt24"><button id="startAdventureBtn" class="btn">この恐竜でスタート</button></div>
+</div>
+</section>
+
+<section id="appScreen" class="screen">
+<div class="card hero"><div class="hero-inner">
+<div class="row" style="justify-content:space-between;align-items:flex-start;">
+<div><div style="font-size:30px;font-weight:1000;">🌟 <span id="homePlayerName">プレイヤー</span> の ダイノクエスト</div><div class="muted mt12">勉強してポイントをためて、恐竜を育てて、冒険しよう！</div></div>
+<div class="row"><button id="saveBtn" class="btn secondary small">保存</button><button id="resetBtn" class="btn red small">最初から</button></div>
+</div>
+
+<div class="top-cards">
+<div class="section-block">
+<div class="dino-box">
+<div id="homeDinoEmoji" class="dino-big">🦖</div>
+<div><div style="font-size:28px;font-weight:1000;"><span id="homeDinoName">ティラノ</span> Lv.<span id="homeLevel">1</span></div><div class="muted mt12">進化段階：<span id="evoStageText">たまご / こども</span></div><div class="xpbar mt12"><div id="xpFill" class="xpfill"></div></div><div class="muted mt12">XP: <span id="xpText">0 / 100</span></div></div>
+</div>
+<div class="stats">
+<div class="stat"><span class="n" id="coinStat">0</span>コイン</div>
+<div class="stat"><span class="n" id="studyPointStat">0</span>育成pt</div>
+<div class="stat"><span class="n" id="clearStat">0</span>クリア</div>
+<div class="stat"><span class="n" id="accuracyStat">0%</span>正答率</div>
+<div class="stat"><span class="n" id="daysStat">0</span>記録日</div>
+<div class="stat"><span class="n" id="bossStat">0</span>ボス勝利</div>
+</div>
+</div>
+
+<div class="section-block">
+<div style="font-size:22px;font-weight:1000;">きょうのミッション</div>
+<div class="muted mt12">✅ 5問正解する</div>
+<div class="muted mt12">✅ 1回育成する</div>
+<div class="muted mt12">✅ 冒険に1回行く</div>
+<div class="row mt16"><span class="reward-chip">🎁 達成で +20コイン</span></div>
+</div>
+</div>
+</div></div>
+
+<div class="menu-grid">
+<aside class="card sidebar">
+<button class="nav-btn active" data-section="home">🏠 ホーム</button>
+<button class="nav-btn" data-section="study">📚 勉強する</button>
+<button class="nav-btn" data-section="train">🦖 そだてる</button>
+<button class="nav-btn" data-section="adventure">🗺 冒険</button>
+<button class="nav-btn" data-section="inventory">🎒 持ち物</button>
+<button class="nav-btn" data-section="encyclopedia">📚 ずかん</button>
+<button class="nav-btn" data-section="parent">👨‍👩‍👧 親モード</button>
+</aside>
+
+<main class="card panel main-panel">
+<section id="section-home">
+<h2 class="panel-title">ホーム</h2>
+<p class="muted">次に何する？ 勉強してポイントをためて、恐竜を強くしよう。</p>
+<div class="reward-grid">
+<div class="tile"><div class="emoji">📚</div><div class="name">勉強する</div><div class="desc">ひらがな・すうじ・きおく でポイントGET</div><div class="mt16"><button class="btn small goto-btn" data-goto="study">いく</button></div></div>
+<div class="tile"><div class="emoji">🦖</div><div class="name">そだてる</div><div class="desc">育成ptを好きな能力にふりわけ</div><div class="mt16"><button class="btn small goto-btn" data-goto="train">いく</button></div></div>
+<div class="tile"><div class="emoji">🗺</div><div class="name">冒険する</div><div class="desc">短時間バトルでアイテムやコイン獲得</div><div class="mt16"><button class="btn small goto-btn" data-goto="adventure">いく</button></div></div>
+</div>
+</section>
+
+<section id="section-study" class="hide">
+<div class="study-header"><div><h2 class="panel-title" style="margin-bottom:0;">勉強する</h2><div class="muted">正解すると XP・育成pt・コインが増える！</div></div><div class="row"><button id="exitStudyBtn" class="btn secondary small">やめる</button></div></div>
+<div id="studyMenu" class="study-grid">
+<div class="tile"><div class="emoji">🔤</div><div class="name">ひらがな</div><div class="desc">ことばの最初の文字をあてる</div><div class="mt16"><button class="btn small study-start" data-study="hiragana">スタート</button></div></div>
+<div class="tile"><div class="emoji">➕</div><div class="name">すうじ</div><div class="desc">たしざん・ひきざん</div><div class="mt16"><button class="btn small study-start" data-study="math">スタート</button></div></div>
+<div class="tile"><div class="emoji">🧠</div><div class="name">きおく</div><div class="desc">カードをそろえる</div><div class="mt16"><button class="btn small study-start" data-study="memory">スタート</button></div></div>
+</div>
+<div id="studyPlayArea" class="hide mt20"></div>
+</section>
+
+<section id="section-train" class="hide">
+<h2 class="panel-title">そだてる</h2>
+<p class="muted">勉強でためた育成ptをふりわけよう。伸ばし方で恐竜の個性が変わる！</p>
+<div class="section-block">
+<div style="font-size:22px;font-weight:1000;">のこり育成pt: <span id="remainingTrainPts">0</span></div>
+<div class="mt16"><div style="font-weight:1000;">❤️ たいりょく <span id="statHp">0</span></div><div class="row mt12"><button class="btn small train-plus" data-stat="hp">+1 ふる</button></div></div>
+<div class="mt16"><div style="font-weight:1000;">💥 パワー <span id="statAtk">0</span></div><div class="row mt12"><button class="btn small train-plus" data-stat="atk">+1 ふる</button></div></div>
+<div class="mt16"><div style="font-weight:1000;">🛡 まもり <span id="statDef">0</span></div><div class="row mt12"><button class="btn small train-plus" data-stat="def">+1 ふる</button></div></div>
+<div class="mt16"><div style="font-weight:1000;">⚡ すばやさ <span id="statSpd">0</span></div><div class="row mt12"><button class="btn small train-plus" data-stat="spd">+1 ふる</button></div></div>
+<div class="mt16"><div style="font-weight:1000;">💡 ひらめき <span id="statInt">0</span></div><div class="row mt12"><button class="btn small train-plus" data-stat="int">+1 ふる</button></div></div>
+</div>
+<div class="section-block">
+<div style="font-size:22px;font-weight:1000;">おせわメニュー</div>
+<div class="reward-grid mt16">
+<div class="tile"><div class="emoji">🍖</div><div class="name">ごはん</div><div class="desc">なつき度 +1 / たまにXP +5</div><div class="mt16"><button id="feedBtn" class="btn small gold">あげる</button></div></div>
+<div class="tile"><div class="emoji">🎾</div><div class="name">あそぶ</div><div class="desc">なつき度 +2 / コイン少し</div><div class="mt16"><button id="playBtn" class="btn small gold">あそぶ</button></div></div>
+<div class="tile"><div class="emoji">✨</div><div class="name">進化チェック</div><div class="desc">条件を満たしたら見た目が変わる</div><div class="mt16"><button id="evoBtn" class="btn small">確認</button></div></div>
+</div>
+<div id="trainMessage" class="msg mt16"></div>
+</div>
+</section>
+
+<section id="section-adventure" class="hide">
+<h2 class="panel-title">冒険</h2>
+<p class="muted">育てた恐竜で短時間バトル！ たまにボスが出るで。</p>
+<div class="adventure-grid">
+<div class="tile"><div class="emoji">🌿</div><div class="name">もりの道</div><div class="desc">初心者向け / コイン小</div><div class="mt16"><button class="btn small adv-start" data-area="forest">いく</button></div></div>
+<div class="tile"><div class="emoji">🔥</div><div class="name">かざんの道</div><div class="desc">中級者向け / アイテム率UP</div><div class="mt16"><button class="btn small adv-start" data-area="volcano">いく</button></div></div>
+<div class="tile"><div class="emoji">👹</div><div class="name">ボスゲート</div><div class="desc">5レベルごとに強い相手</div><div class="mt16"><button class="btn small gold adv-start" data-area="boss">いく</button></div></div>
+</div>
+<div id="adventureArea" class="mt20"></div>
+</section>
+
+<section id="section-inventory" class="hide">
+<h2 class="panel-title">持ち物</h2>
+<p class="muted">冒険や勉強で手に入れたアイテム</p>
+<div id="inventoryList" class="inventory-grid"></div>
+</section>
+
+<section id="section-encyclopedia" class="hide">
+<h2 class="panel-title">ずかん</h2>
+<div class="section-block"><div style="font-size:22px;font-weight:1000;">進化情報</div><div class="muted mt12">Lv3 で1進化 / Lv6 で2進化 / Lv10 で最終進化</div><div class="mt16 row"><span class="reward-chip">🥚 こども</span><span class="reward-chip">🦖 1進化</span><span class="reward-chip">🦕 2進化</span><span class="reward-chip">🐲 最終進化</span></div></div>
+<div class="section-block"><div style="font-size:22px;font-weight:1000;">解放ごほうび</div><div id="rewardUnlockedWrap" class="mt12"></div></div>
+</section>
+
+<section id="section-parent" class="hide">
+<h2 class="panel-title">親モード</h2>
+<p class="muted">学習記録の確認用。子どもにはゲーム、親には管理画面。</p>
+<table>
+<tr><th>項目</th><th>内容</th></tr>
+<tr><td>おなまえ</td><td id="parentName">-</td></tr>
+<tr><td>正答率</td><td id="parentAccuracy">0%</td></tr>
+<tr><td>記録日数</td><td id="parentDays">0</td></tr>
+<tr><td>ボス勝利</td><td id="parentBossWins">0</td></tr>
+<tr><td>なつき度</td><td id="parentAffinity">0</td></tr>
+<tr><td>総勉強回数</td><td id="parentStudySessions">0</td></tr>
+</table>
+<div class="section-block"><div style="font-size:22px;font-weight:1000;">最近の記録</div><table id="historyTable"><tr><th>日付</th><th>内容</th><th>獲得</th></tr></table></div>
+<div class="section-block"><div style="font-size:22px;font-weight:1000;">対戦機能</div><div class="muted mt12">今はオフライン版。友達と本物対戦は次のオンライン版で追加できる。</div></div>
+</section>
+</main>
+</div>
+<div class="footer-space"></div>
+</section>
+</div>
+
+<script>
+const STORAGE_KEY = "dinoquest_offline_v2";
+const DINO_MASTER = [
+{id:"tyranno",name:"ティラノ",emojiBase:"🦖",emoji1:"🦖",emoji2:"🦕",emoji3:"🐲",desc:"パワーが伸びやすい こうげき型",growth:{hp:1,atk:2,def:1,spd:1,int:1}},
+{id:"tricera",name:"トリケラ",emojiBase:"🦏",emoji1:"🦏",emoji2:"🦣",emoji3:"🐉",desc:"まもりが高い ぼうぎょ型",growth:{hp:2,atk:1,def:2,spd:1,int:1}},
+{id:"ptera",name:"プテラ",emojiBase:"🦅",emoji1:"🦅",emoji2:"🕊️",emoji3:"🐉",desc:"すばやさが高い スピード型",growth:{hp:1,atk:1,def:1,spd:2,int:2}},
+{id:"stego",name:"ステゴ",emojiBase:"🦕",emoji1:"🦕",emoji2:"🦖",emoji3:"🐲",desc:"バランスのいい 安定型",growth:{hp:1,atk:1,def:2,spd:1,int:2}},
+{id:"brachio",name:"ブラキオ",emojiBase:"🦒",emoji1:"🦒",emoji2:"🦕",emoji3:"🐲",desc:"たいりょくが高い HP型",growth:{hp:2,atk:1,def:1,spd:1,int:2}}
+];
+const REWARD_MASTER = [
+{need:30,name:"🍬 あまいキャンディ"},
+{need:70,name:"🎩 かっこいいぼうし"},
+{need:120,name:"🛡 レアシールド"},
+{need:180,name:"👑 ダイノクラウン"}
+];
+const state = {started:false,playerName:"",selectedDinoId:"",level:1,xp:0,coins:0,trainPts:0,clears:0,correct:0,answered:0,bossWins:0,affinity:0,studySessions:0,recordDays:{},history:[],rewardsUnlocked:[],inventory:{},stats:{hp:5,atk:5,def:5,spd:5,int:5},currentStudy:null,currentQuestion:null,currentStudyScore:0,currentStudyIndex:0,timerId:null,timeLeft:0,adventureEnemy:null,memoryDeck:null,memoryFlip:[]};
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function load(){ const raw = localStorage.getItem(STORAGE_KEY); if(!raw) return false; try{ Object.assign(state, JSON.parse(raw)); return !!state.started; }catch(e){ return false; } }
+function resetAll(){ localStorage.removeItem(STORAGE_KEY); location.reload(); }
+function todayKey(){ const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; }
+function pushHistory(type, gain){ const key=todayKey(); state.recordDays[key]=true; state.history.unshift({date:key,type,gain}); state.history=state.history.slice(0,16); }
+function addInventory(name,count=1){ state.inventory[name]=(state.inventory[name]||0)+count; }
+function getSelectedDino(){ return DINO_MASTER.find(d=>d.id===state.selectedDinoId)||DINO_MASTER[0]; }
+function getDinoEmoji(){ const d=getSelectedDino(); if(state.level>=10) return d.emoji3; if(state.level>=6) return d.emoji2; if(state.level>=3) return d.emoji1; return d.emojiBase; }
+function getEvoText(){ if(state.level>=10) return "最終進化"; if(state.level>=6) return "2進化"; if(state.level>=3) return "1進化"; return "たまご / こども"; }
+function getAccuracy(){ return state.answered ? Math.round((state.correct/state.answered)*100) : 0; }
+function getRecordDaysCount(){ return Object.keys(state.recordDays).length; }
+function addXp(amount){ state.xp += amount; while(state.xp >= state.level * 100){ state.level += 1; } }
+function checkRewards(){ REWARD_MASTER.forEach(r => { if(state.coins >= r.need && !state.rewardsUnlocked.includes(r.name)){ state.rewardsUnlocked.push(r.name); addInventory(r.name,1); } }); }
+function getStudyDifficulty(){ return Math.min(5, Math.floor((state.level - 1) / 2) + 1); }
+function getStudyTimer(){ return Math.max(5, 11 - getStudyDifficulty()); }
+function stopTimer(){ if(state.timerId){ clearInterval(state.timerId); state.timerId=null; } }
+function startTimer(onTimeout){ stopTimer(); state.timeLeft=getStudyTimer(); updateTimerUi(); state.timerId=setInterval(()=>{ state.timeLeft -= 1; updateTimerUi(); if(state.timeLeft<=0){ stopTimer(); onTimeout(); } }, 1000); }
+function updateTimerUi(){ const total=getStudyTimer(); const percent=Math.max(0,(state.timeLeft/total)*100); const text=document.getElementById("timeText"); const bar=document.getElementById("timeFill"); if(text) text.textContent=state.timeLeft; if(bar) bar.style.width=percent+"%"; }
+function showScreen(id){ document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active")); document.getElementById(id).classList.add("active"); }
+function showSection(section){ document.querySelectorAll(".nav-btn").forEach(btn=>btn.classList.toggle("active", btn.dataset.section===section)); ["home","study","train","adventure","inventory","encyclopedia","parent"].forEach(name=>{ document.getElementById("section-"+name).classList.toggle("hide", name!==section); }); if(section==="inventory") renderInventory(); if(section==="encyclopedia") renderRewards(); if(section==="parent") renderParent(); if(section==="train") renderTrain(); }
+function renderSetup(){ const grid=document.getElementById("dinoSelectGrid"); grid.innerHTML=""; DINO_MASTER.forEach((d,idx)=>{ const div=document.createElement("button"); div.type="button"; div.className="dino-select"+((state.selectedDinoId?state.selectedDinoId===d.id:idx===0)?" active":""); div.innerHTML=`<div class="dino-emoji">${d.emojiBase}</div><div class="dino-name">${d.name}</div><div class="dino-desc">${d.desc}</div>`; div.addEventListener("click",()=>{ state.selectedDinoId=d.id; renderSetup(); }); grid.appendChild(div); }); if(!state.selectedDinoId) state.selectedDinoId=DINO_MASTER[0].id; }
+function updateUi(){
+document.getElementById("homePlayerName").textContent=state.playerName||"プレイヤー";
+document.getElementById("homeDinoEmoji").textContent=getDinoEmoji();
+document.getElementById("homeDinoName").textContent=getSelectedDino().name;
+document.getElementById("homeLevel").textContent=state.level;
+document.getElementById("evoStageText").textContent=getEvoText();
+document.getElementById("coinStat").textContent=state.coins;
+document.getElementById("studyPointStat").textContent=state.trainPts;
+document.getElementById("clearStat").textContent=state.clears;
+document.getElementById("accuracyStat").textContent=getAccuracy()+"%";
+document.getElementById("daysStat").textContent=getRecordDaysCount();
+document.getElementById("bossStat").textContent=state.bossWins;
+const currentXp=state.xp-((state.level-1)*100);
+document.getElementById("xpFill").style.width=Math.max(0,Math.min(100,currentXp))+"%";
+document.getElementById("xpText").textContent=currentXp+" / 100";
+renderTrain(); checkRewards(); save();
+}
+function startNewGame(){ showScreen("setupScreen"); renderSetup(); }
+function startAdventure(){ state.started=true; state.playerName=document.getElementById("playerName").value.trim()||"はるき"; if(!state.selectedDinoId) state.selectedDinoId=DINO_MASTER[0].id; updateUi(); showScreen("appScreen"); showSection("home"); }
+function continueGame(){ if(load()){ updateUi(); showScreen("appScreen"); showSection("home"); } else { alert("まだセーブデータがないで"); } }
+function renderTrain(){ document.getElementById("remainingTrainPts").textContent=state.trainPts; document.getElementById("statHp").textContent=state.stats.hp; document.getElementById("statAtk").textContent=state.stats.atk; document.getElementById("statDef").textContent=state.stats.def; document.getElementById("statSpd").textContent=state.stats.spd; document.getElementById("statInt").textContent=state.stats.int; }
+function labelOfStat(key){ return {hp:"たいりょく",atk:"パワー",def:"まもり",spd:"すばやさ",int:"ひらめき"}[key]; }
+function setTrainMessage(text, ok=true){ const el=document.getElementById("trainMessage"); el.textContent=text; el.className="msg "+(ok?"good":"bad"); }
+function trainStat(key){ if(state.trainPts<=0){ setTrainMessage("❌ 育成ptがたりへん", false); return; } const growth=getSelectedDino().growth[key]||1; state.trainPts-=1; state.stats[key]+=growth; setTrainMessage(`⬆️ ${labelOfStat(key)} が ${growth} あがった！`, true); updateUi(); }
+function feedDino(){ state.affinity += 1; if(Math.random() < 0.4) addXp(5); setTrainMessage("🍖 ごはんを あげた！ なつき度アップ！", true); updateUi(); }
+function playWithDino(){ state.affinity += 2; state.coins += 3; pushHistory("あそぶ", "+3コイン"); setTrainMessage("🎾 いっしょに あそんだ！ なつき度アップ！", true); updateUi(); }
+function checkEvolution(){ setTrainMessage(`✨ いまの進化段階は「${getEvoText()}」やで！`, true); updateUi(); }
+function shuffle(arr){ return [...arr].sort(() => Math.random() - 0.5); }
+function generateHiraganaQuestion(){
+const diff=getStudyDifficulty();
+const easy=["りんご","ねこ","いぬ","もも","さかな","やま","かわ","くるま"];
+const hard=["れいぞうこ","しんかんせん","たこやき","おにぎり","でんしゃ","きょうりゅう"];
+const words=diff>=3 ? easy.concat(hard) : easy;
+const word=words[Math.floor(Math.random()*words.length)];
+const answer=word[0];
+const pool="あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわ";
+let choices=[answer];
+while(choices.length<3){ const c=pool[Math.floor(Math.random()*pool.length)]; if(!choices.includes(c)) choices.push(c); }
+return {prompt:`「${word}」の さいしょの もじは？`, answer, choices:shuffle(choices), boss:false};
+}
+function generateMathQuestion(boss=false){
+const diff=getStudyDifficulty();
+let max=boss ? 30 : (diff<=2 ? 9 : diff<=4 ? 15 : 20);
+let a=Math.floor(Math.random()*max)+1, b=Math.floor(Math.random()*max)+1;
+const plus=Math.random()>0.45;
+let answer,prompt;
+if(plus){ answer=a+b; prompt=`${a} + ${b} は？`; }
+else{ if(a<b){ const t=a; a=b; b=t; } answer=a-b; prompt=`${a} - ${b} は？`; }
+let choices=[answer];
+while(choices.length<3){ let fake=answer+Math.floor(Math.random()*7)-3; if(fake<0) fake=answer+1; if(!choices.includes(fake)) choices.push(fake); }
+return {prompt, answer:String(answer), choices:shuffle(choices.map(String)), boss};
+}
+function startStudy(kind){ state.currentStudy=kind; state.currentStudyIndex=0; state.currentStudyScore=0; document.getElementById("studyMenu").classList.add("hide"); document.getElementById("studyPlayArea").classList.remove("hide"); state.studySessions += 1; if(kind==="memory") startMemoryStudy(); else renderStudyQuestion(); }
+function renderStudyQuestion(){
+const isBoss=(state.currentStudyIndex+1)%5===0;
+let q=state.currentStudy==="hiragana" ? generateHiraganaQuestion() : generateMathQuestion(isBoss);
+q.boss=isBoss; state.currentQuestion=q;
+const wrap=document.getElementById("studyPlayArea");
+wrap.innerHTML=`<div class="section-block">
+${q.boss ? `<div class="boss-box"><div style="font-size:22px;font-weight:1000;">🔥 ボス問題！</div><div class="muted mt12">これに勝つとボーナス大！</div></div>` : ""}
+<div class="study-header"><div style="font-size:22px;font-weight:1000;">${state.currentStudy==="hiragana" ? "🔤 ひらがな" : "➕ すうじ"}</div><div class="muted">問題 ${state.currentStudyIndex + 1}</div></div>
+<div class="timer-row"><div style="font-weight:1000;">⏰ のこり <span id="timeText">${getStudyTimer()}</span> 秒</div><div class="timer-box"><div class="bar"><div id="timeFill" class="barfill" style="width:100%"></div></div></div></div>
+<div class="question">${q.prompt}<span class="subq">正解すると XP・育成pt・コイン がもらえる！</span></div>
+<div id="choiceWrap" class="choices"></div><div id="studyMsg" class="msg"></div>
+<div class="center mt20"><button id="stopStudyBtn" class="btn secondary small">勉強メニューへもどる</button></div></div>`;
+const choiceWrap=document.getElementById("choiceWrap");
+q.choices.forEach(choice=>{ const btn=document.createElement("button"); btn.type="button"; btn.className="choice"; btn.textContent=choice; btn.addEventListener("click",()=>answerStudy(choice)); choiceWrap.appendChild(btn); });
+document.getElementById("stopStudyBtn").addEventListener("click", exitStudy);
+startTimer(()=>{ const msg=document.getElementById("studyMsg"); msg.className="msg bad"; msg.textContent="⏰ じかんぎれ！"; setTimeout(nextStudyQuestion,650); });
+}
+function answerStudy(choice){
+stopTimer(); state.answered += 1;
+const msg=document.getElementById("studyMsg"); const q=state.currentQuestion;
+if(String(choice)===String(q.answer)){
+state.correct += 1; state.currentStudyScore += 1;
+const gainPt=q.boss ? 3 : 1, gainXp=q.boss ? 25 : 10, gainCoin=q.boss ? 12 : 5;
+state.trainPts += gainPt; state.coins += gainCoin; addXp(gainXp); pushHistory("勉強：" + state.currentStudy, `+${gainPt}pt / +${gainCoin}コイン`);
+msg.className="msg good"; msg.textContent=q.boss ? "👑 ボスせいかい！ ごほうびアップ！" : "⭕ せいかい！";
+} else { msg.className="msg bad"; msg.textContent="❌ ちがう！"; }
+updateUi(); setTimeout(nextStudyQuestion,650);
+}
+function nextStudyQuestion(){ state.currentStudyIndex += 1; if(state.currentStudyIndex >= 5) finishStudy(); else renderStudyQuestion(); }
+function finishStudy(){
+stopTimer(); state.clears += 1; updateUi();
+const wrap=document.getElementById("studyPlayArea");
+wrap.innerHTML=`<div class="section-block center"><div style="font-size:46px;">🎉</div><div style="font-size:32px;font-weight:1000;">勉強クリア！</div><div class="muted mt12">スコア ${state.currentStudyScore} / 5</div><div class="row center mt20" style="justify-content:center;"><button id="againStudyBtn" class="btn">もういちど</button><button id="backStudyMenuBtn" class="btn secondary">勉強メニューへ</button></div></div>`;
+document.getElementById("againStudyBtn").addEventListener("click",()=>startStudy(state.currentStudy));
+document.getElementById("backStudyMenuBtn").addEventListener("click",exitStudy);
+}
+function exitStudy(){ stopTimer(); state.currentStudy=null; document.getElementById("studyMenu").classList.remove("hide"); document.getElementById("studyPlayArea").classList.add("hide"); document.getElementById("studyPlayArea").innerHTML=""; updateUi(); }
+function startMemoryStudy(){
+const base=["🦖","🐰","🐻","🦊"];
+state.memoryDeck=shuffle([...base,...base]).map((emoji,i)=>({id:i,emoji,open:false,done:false}));
+state.memoryFlip=[];
+const wrap=document.getElementById("studyPlayArea");
+wrap.innerHTML=`<div class="section-block"><div class="study-header"><div style="font-size:22px;font-weight:1000;">🧠 きおくゲーム</div><div class="muted">そろえると育成pt GET</div></div><div id="memoryGrid" class="memory-grid"></div><div id="studyMsg" class="msg"></div><div class="center mt20"><button id="stopStudyBtn" class="btn secondary small">勉強メニューへもどる</button></div></div>`;
+document.getElementById("stopStudyBtn").addEventListener("click",exitStudy);
+renderMemoryStudy();
+}
+function renderMemoryStudy(){
+const grid=document.getElementById("memoryGrid"), msg=document.getElementById("studyMsg");
+if(!grid) return;
+grid.innerHTML="";
+state.memoryDeck.forEach((card,index)=>{ const btn=document.createElement("button"); btn.type="button"; btn.className="memory-card"+((card.open||card.done)?" show":"")+(card.done?" done":""); btn.textContent=(card.open||card.done)?card.emoji:"？"; btn.addEventListener("click",()=>flipMemoryStudy(index)); grid.appendChild(btn); });
+if(state.memoryDeck.every(c=>c.done)){
+msg.className="msg good"; msg.textContent="🎉 ぜんぶ そろえた！ +3育成pt";
+state.trainPts += 3; state.coins += 8; addXp(18); state.clears += 1; pushHistory("勉強：きおく","+3pt / +8コイン"); updateUi(); setTimeout(exitStudy,1000);
+}
+}
+function flipMemoryStudy(index){
+const card=state.memoryDeck[index];
+if(card.done||card.open||state.memoryFlip.length>=2) return;
+card.open=true; state.memoryFlip.push(index); renderMemoryStudy();
+if(state.memoryFlip.length===2){
+const [a,b]=state.memoryFlip, A=state.memoryDeck[a], B=state.memoryDeck[b];
+const msg=document.getElementById("studyMsg");
+if(A.emoji===B.emoji){ A.done=true; B.done=true; state.memoryFlip=[]; msg.className="msg good"; msg.textContent="⭕ そろった！"; renderMemoryStudy(); }
+else { msg.className="msg bad"; msg.textContent="❌ ちがった！"; setTimeout(()=>{ A.open=false; B.open=false; state.memoryFlip=[]; renderMemoryStudy(); },650); }
+}
+}
+function createEnemy(area){
+if(area==="boss") return {name:"まおうザウルス",emoji:"👹",hp:40+state.level*8,atk:8+Math.floor(state.level*1.6),def:6+Math.floor(state.level*1.4),rewardCoin:30+state.level*3,rewardItem:"ボスのキバ"};
+if(area==="volcano") return {name:"ほのおドレイク",emoji:"🔥",hp:22+state.level*4,atk:6+Math.floor(state.level*1.2),def:4+Math.floor(state.level*1.1),rewardCoin:18+state.level*2,rewardItem:"ようがんのかけら"};
+return {name:"もりのモンスター",emoji:"🌿",hp:18+state.level*3,atk:4+Math.floor(state.level),def:3+Math.floor(state.level*.8),rewardCoin:12+state.level*2,rewardItem:"もりのはっぱ"};
+}
+function getPlayerBattleHp(){ return 20+state.level*4+state.stats.hp*2; }
+function getPlayerAttack(){ return 4+state.stats.atk+Math.floor(state.level*1.2); }
+function getPlayerDefense(){ return 2+state.stats.def+Math.floor(state.level*0.8); }
+function startAdventureBattle(area){
+const enemy=createEnemy(area);
+state.adventureEnemy={area,enemyHp:enemy.hp,enemyMaxHp:enemy.hp,playerHp:getPlayerBattleHp(),playerMaxHp:getPlayerBattleHp(),data:enemy,log:`${enemy.emoji} ${enemy.name} が あらわれた！`};
+renderAdventureBattle();
+}
+function renderAdventureBattle(){
+const b=state.adventureEnemy, area=document.getElementById("adventureArea");
+if(!b){ area.innerHTML=""; return; }
+area.innerHTML=`<div class="section-block">
+<div class="row" style="justify-content:space-between;align-items:center;"><div style="font-size:24px;font-weight:1000;">${getDinoEmoji()} ${getSelectedDino().name}</div><div style="font-size:24px;font-weight:1000;">${b.data.emoji} ${b.data.name}</div></div>
+<div class="mt16"><div style="font-weight:1000;">あなた HP ${b.playerHp} / ${b.playerMaxHp}</div><div class="bar mt12"><div class="barfill" style="width:${(b.playerHp/b.playerMaxHp)*100}%"></div></div></div>
+<div class="mt16"><div style="font-weight:1000;">敵 HP ${b.enemyHp} / ${b.enemyMaxHp}</div><div class="bar mt12"><div class="barfill" style="width:${(b.enemyHp/b.enemyMaxHp)*100}%"></div></div></div>
+<div class="skill-row"><button class="btn" data-skill="attack">こうげき</button><button class="btn gold" data-skill="smart">ひらめき</button><button class="btn secondary" data-skill="guard">まもる</button></div>
+<div class="mt16 battle-log" id="battleLog">${b.log}</div></div>`;
+area.querySelectorAll("[data-skill]").forEach(btn=>btn.addEventListener("click",()=>useBattleSkill(btn.dataset.skill)));
+}
+function useBattleSkill(skill){
+const b=state.adventureEnemy; if(!b) return;
+let damage=0, enemyDamage=0, log="";
+if(skill==="attack"){ damage=Math.max(1, getPlayerAttack()-Math.floor(b.data.def/2)+Math.floor(Math.random()*4)); log += `💥 こうげき！ ${damage} ダメージ\n`; }
+else if(skill==="smart"){ damage=Math.max(2, state.stats.int+Math.floor(state.level*0.8)+Math.floor(Math.random()*5)); log += `💡 ひらめきアタック！ ${damage} ダメージ\n`; }
+else { damage=Math.max(1, Math.floor(getPlayerAttack()/2)); log += `🛡 まもりながら攻撃！ ${damage} ダメージ\n`; }
+b.enemyHp -= damage;
+if(b.enemyHp<=0){ winBattle(); return; }
+const defendBonus=skill==="guard"?4:0;
+enemyDamage=Math.max(1, b.data.atk-getPlayerDefense()-defendBonus+Math.floor(Math.random()*3));
+b.playerHp -= enemyDamage; log += `😈 敵のこうげき！ ${enemyDamage} ダメージ`;
+b.log=log;
+if(b.playerHp<=0) loseBattle(); else renderAdventureBattle();
+}
+function winBattle(){
+const b=state.adventureEnemy, area=document.getElementById("adventureArea");
+state.coins += b.data.rewardCoin; addXp(b.data.rewardCoin>=30?28:16); state.trainPts += b.data.rewardCoin>=30?3:1; addInventory(b.data.rewardItem,1); pushHistory("冒険："+b.data.name, `+${b.data.rewardCoin}コイン / ${b.data.rewardItem}`); if(b.data.name==="まおうザウルス") state.bossWins += 1; state.clears += 1; updateUi();
+area.innerHTML=`<div class="section-block center"><div style="font-size:54px;">🏆</div><div style="font-size:32px;font-weight:1000;">しょうり！</div><div class="muted mt12">+${b.data.rewardCoin} コイン</div><div class="muted mt12">アイテム：${b.data.rewardItem}</div><div class="row center mt20" style="justify-content:center;"><button id="advAgainBtn" class="btn">もう1回</button><button id="advHomeBtn" class="btn secondary">ホームへ</button></div></div>`;
+document.getElementById("advAgainBtn").addEventListener("click",()=>startAdventureBattle(b.area));
+document.getElementById("advHomeBtn").addEventListener("click",()=>showSection("home"));
+state.adventureEnemy=null;
+}
+function loseBattle(){
+const b=state.adventureEnemy, area=document.getElementById("adventureArea");
+area.innerHTML=`<div class="section-block center"><div style="font-size:54px;">😵</div><div style="font-size:32px;font-weight:1000;">ざんねん…</div><div class="muted mt12">もっと育ててから もういちど挑戦しよう！</div><div class="row center mt20" style="justify-content:center;"><button id="retryBattleBtn" class="btn">リベンジ</button><button id="backHomeBattleBtn" class="btn secondary">ホームへ</button></div></div>`;
+document.getElementById("retryBattleBtn").addEventListener("click",()=>startAdventureBattle(b.area));
+document.getElementById("backHomeBattleBtn").addEventListener("click",()=>showSection("home"));
+state.adventureEnemy=null;
+}
+function renderInventory(){
+const wrap=document.getElementById("inventoryList"); wrap.innerHTML="";
+const entries=Object.entries(state.inventory);
+if(entries.length===0){ wrap.innerHTML=`<div class="tile"><div class="name">まだアイテムなし</div><div class="desc">勉強や冒険で集めよう！</div></div>`; return; }
+entries.forEach(([name,count])=>{ const div=document.createElement("div"); div.className="tile"; div.innerHTML=`<div class="emoji">🎁</div><div class="name">${name}</div><div class="desc">x ${count}</div>`; wrap.appendChild(div); });
+}
+function renderRewards(){
+const wrap=document.getElementById("rewardUnlockedWrap"); wrap.innerHTML="";
+if(state.rewardsUnlocked.length===0){ wrap.innerHTML=`<div class="muted">まだごほうびは解放されてないで</div>`; return; }
+state.rewardsUnlocked.forEach(r=>{ const span=document.createElement("span"); span.className="reward-chip"; span.textContent=r; wrap.appendChild(span); });
+}
+function renderParent(){
+document.getElementById("parentName").textContent=state.playerName||"-";
+document.getElementById("parentAccuracy").textContent=getAccuracy()+"%";
+document.getElementById("parentDays").textContent=getRecordDaysCount();
+document.getElementById("parentBossWins").textContent=state.bossWins;
+document.getElementById("parentAffinity").textContent=state.affinity;
+document.getElementById("parentStudySessions").textContent=state.studySessions;
+const table=document.getElementById("historyTable");
+table.innerHTML=`<tr><th>日付</th><th>内容</th><th>獲得</th></tr>`;
+if(state.history.length===0){ const tr=document.createElement("tr"); tr.innerHTML=`<td colspan="3">まだ記録なし</td>`; table.appendChild(tr); }
+else { state.history.forEach(h=>{ const tr=document.createElement("tr"); tr.innerHTML=`<td>${h.date}</td><td>${h.type}</td><td>${h.gain}</td>`; table.appendChild(tr); }); }
+}
+function bindEvents(){
+document.getElementById("newGameBtn").addEventListener("click",startNewGame);
+document.getElementById("continueBtn").addEventListener("click",continueGame);
+document.getElementById("startAdventureBtn").addEventListener("click",startAdventure);
+document.getElementById("saveBtn").addEventListener("click",()=>{ save(); alert("保存したで"); });
+document.getElementById("resetBtn").addEventListener("click",resetAll);
+document.querySelectorAll(".nav-btn").forEach(btn=>btn.addEventListener("click",()=>showSection(btn.dataset.section)));
+document.querySelectorAll(".goto-btn").forEach(btn=>btn.addEventListener("click",()=>showSection(btn.dataset.goto)));
+document.querySelectorAll(".study-start").forEach(btn=>btn.addEventListener("click",()=>startStudy(btn.dataset.study)));
+document.getElementById("exitStudyBtn").addEventListener("click",exitStudy);
+document.querySelectorAll(".train-plus").forEach(btn=>btn.addEventListener("click",()=>trainStat(btn.dataset.stat)));
+document.getElementById("feedBtn").addEventListener("click",feedDino);
+document.getElementById("playBtn").addEventListener("click",playWithDino);
+document.getElementById("evoBtn").addEventListener("click",checkEvolution);
+document.querySelectorAll(".adv-start").forEach(btn=>btn.addEventListener("click",()=>startAdventureBattle(btn.dataset.area)));
+}
+bindEvents();
+if(load()){ updateUi(); showScreen("appScreen"); showSection("home"); }
+</script>
 </body>
 </html>
